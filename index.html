@@ -239,6 +239,7 @@
       <div class="kpi-label">三院累計淨營收</div>
       <div class="kpi-value" id="kpi-total-val">—<span class="kpi-unit">萬</span></div>
       <div class="kpi-note" id="kpi-total-note">載入中…</div>
+      <div class="kpi-note" id="kpi-rev-ts" style="margin-top:4px;font-size:10px;opacity:0.6;">業績快照更新中…</div>
     </div>
     <div class="kpi">
       <div class="kpi-label">累計患者來診</div>
@@ -828,6 +829,13 @@ async function init() {
     if (ccHc) ccHc.innerHTML = `${fmt1(AUG_ACT.hc)}<span style="font-size:14px;">萬</span>`;
     const ccKh = document.getElementById('cc-rev-kh');
     if (ccKh) ccKh.innerHTML = `${fmt1(AUG_ACT.kh)}<span style="font-size:14px;">萬</span>`;
+
+    // 顯示業績快照更新時間
+    const tsEl = document.getElementById('kpi-rev-ts');
+    if (tsEl) {
+      const ts = json.revenueUpdatedAt || '';
+      tsEl.textContent = ts ? `業績快照：${ts}（每日凌晨更新）` : '業績快照更新時間未知';
+    }
   }
 
   renderProjCards();
