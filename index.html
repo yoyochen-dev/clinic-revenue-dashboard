@@ -743,9 +743,10 @@ let AUG_TGT = {
 };
 
 async function init() {
+  let json = {};  // 宣告在外層，fetch 失敗時使用空物件當預設值
   try {
     const res  = await fetch(APPS_SCRIPT_URL);
-    const json = await res.json();
+    json = await res.json();
 
     // ── Step 1：診次歷史 → 動態更新 MR.labels / MR.sessions / WD ──
     // 每月底自動歸檔後，歷史月份列表會自動延長，不用手動改 HTML
