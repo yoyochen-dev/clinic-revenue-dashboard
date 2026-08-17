@@ -237,8 +237,8 @@
   <div class="kpi-row">
     <div class="kpi dark">
       <div class="kpi-label">三院累計淨營收</div>
-      <div class="kpi-value">3,364.6<span class="kpi-unit">萬</span></div>
-      <div class="kpi-note">台北 1,773.4萬・新竹 838.6萬・高雄 752.6萬</div>
+      <div class="kpi-value" id="kpi-total-val">—<span class="kpi-unit">萬</span></div>
+      <div class="kpi-note" id="kpi-total-note">載入中…</div>
     </div>
     <div class="kpi">
       <div class="kpi-label">累計患者來診</div>
@@ -267,7 +267,7 @@
           <span class="cc-pct">51%</span>
         </div>
       </div>
-      <div class="cc-revenue">1,773.4<span style="font-size:14px;">萬</span></div>
+      <div class="cc-revenue" id="cc-rev-tp">—<span style="font-size:14px;">萬</span></div>
       <div class="cc-metrics">
         <div>
           <div class="cc-m-label">患者人次</div>
@@ -291,7 +291,7 @@
           <span class="cc-pct">51%</span>
         </div>
       </div>
-      <div class="cc-revenue">838.6<span style="font-size:14px;">萬</span></div>
+      <div class="cc-revenue" id="cc-rev-hc">—<span style="font-size:14px;">萬</span></div>
       <div class="cc-metrics">
         <div>
           <div class="cc-m-label">患者人次</div>
@@ -315,7 +315,7 @@
           <span class="cc-pct">48%</span>
         </div>
       </div>
-      <div class="cc-revenue">752.6<span style="font-size:14px;">萬</span></div>
+      <div class="cc-revenue" id="cc-rev-kh">—<span style="font-size:14px;">萬</span></div>
       <div class="cc-metrics">
         <div>
           <div class="cc-m-label">患者人次</div>
@@ -481,60 +481,7 @@
           <th>預估全月業績</th>
         </tr>
       </thead>
-      <tbody>
-        <tr>
-          <td>台北初日</td>
-          <td>3,600萬</td>
-          <td>13／26天</td>
-          <td>78／152</td>
-          <td>1,773.4萬</td>
-          <td>1,847.4萬</td>
-          <td class="c-b">−74.0萬</td>
-          <td class="c-warn">49.3%</td>
-          <td>136.4萬</td>
-          <td>22.7萬</td>
-          <td class="c-b">3,455.8萬</td>
-        </tr>
-        <tr>
-          <td>新竹初日</td>
-          <td>1,400萬</td>
-          <td>13／26天</td>
-          <td>39／77</td>
-          <td>838.6萬</td>
-          <td>709.1萬</td>
-          <td class="c-a">+129.5萬</td>
-          <td class="c-a">59.9%</td>
-          <td>64.5萬</td>
-          <td>21.5萬</td>
-          <td class="c-a">1,655.7萬</td>
-        </tr>
-        <tr>
-          <td>高雄初日</td>
-          <td>1,300萬</td>
-          <td>13／26天</td>
-          <td>48／100</td>
-          <td>752.6萬</td>
-          <td>624.0萬</td>
-          <td class="c-a">+128.6萬</td>
-          <td class="c-a">57.9%</td>
-          <td>57.9萬</td>
-          <td>15.7萬</td>
-          <td class="c-a">1,567.9萬</td>
-        </tr>
-        <tr class="total-row">
-          <td>三院合計</td>
-          <td>6,300萬</td>
-          <td>13／26天</td>
-          <td>165／329</td>
-          <td>3,364.6萬</td>
-          <td>3,180.5萬</td>
-          <td class="c-a">+184.1萬</td>
-          <td class="c-a">53.4%</td>
-          <td>258.8萬</td>
-          <td>—</td>
-          <td class="c-a">6,679.4萬</td>
-        </tr>
-      </tbody>
+      <tbody id="aug-table-body"></tbody>
     </table>
     <div class="footnote">
       ＊ 每診格均收 = 當前業績 ÷ 已過診次（診格）；與每人次營收（患者人次）定義不同，請勿混用<br>
@@ -558,11 +505,18 @@
       <div class="mp-section-title">1–8月業績總覽</div>
       <span id="hist-total-badge" class="hr-total-badge hr-red" style="font-size:12px;"></span>
     </div>
-    <div style="font-size:11px;color:#9ca3af;margin-bottom:14px;">
-      HIS+POS 全品項 ‖ 達成率 ≥100% 綠 / 90–99% 橘 / &lt;90% 紅 ‖ 8月截至 8/15（13上班天）
+    <div id="hist-review-sub" style="font-size:11px;color:#9ca3af;margin-bottom:14px;">
+      HIS+POS 全品項 ‖ 達成率 ≥100% 綠 / 90–99% 橘 / &lt;90% 紅 ‖ 當月進度以截至日為準
     </div>
     <div style="overflow-x:auto;">
       <table class="ss-table" id="hist-review-table"></table>
+    </div>
+    <div style="font-size:10px;color:#9ca3af;margin-top:10px;padding-top:8px;border-top:1px solid #f3f4f6;line-height:1.9;">
+      ＊ 業績欄顏色說明：
+      <span style="color:#059669;font-weight:700;">✓ 綠</span> ≥ 100%
+      <span style="color:#1a1a1a;font-weight:700;">黑</span> 90–99%
+      <span style="color:#d97706;font-weight:700;">橘</span> 85–89%
+      <span style="color:#dc2626;font-weight:700;">紅</span> ＜ 85%　｜當月欄為進行中，不顯示達成色
     </div>
   </div>
 
@@ -851,22 +805,37 @@ renderDoc('tp');
    actual  來源：Databricks HIS+POS 合計（元）
 ───────────────────────────────────────── */
 const MR = {
+  // ★ labels / sessions / WD 在 init() 從 Apps Script 診次歷史動態更新
   labels:   ['1月','2月','3月','4月','5月','6月','7月'],
   sessions: {
     tp: [141,108,155,149,147,148,148],
     hc: [52, 40, 52, 48, 50, 52, 64],
-    kh: [73, 66, 99, 89, 86, 92, 102]
+    kh: [73, 66, 99, 89, 86, 92, 102],
+    tc: []  // 台中：9月起開始
   },
-  targets: {           // 萬元
-    tp: [3200,3000,3300,3500,3500,3500,3600],
-    hc: [1200,1000,1300,1300,1300,1300,1400],
-    kh: [1000,1000,1200,1200,1400,1400,1400]
+  targets: {  // 萬元，完整 2026 目標（index 0=1月 … 11=12月）
+    //          1月    2月    3月    4月    5月    6月    7月    8月    9月   10月   11月   12月
+    tp: [3200, 3000, 3300, 3500, 3500, 3500, 3600, 3600, 3600, 3600, 3800, 3800],
+    hc: [1200, 1000, 1300, 1300, 1300, 1300, 1400, 1400, 1300, 1400, 1400, 1500],
+    kh: [1000, 1000, 1200, 1200, 1400, 1400, 1400, 1400, 1300, 1300, 1300, 1500],
+    tc: [   0,    0,    0,    0,    0,    0,    0,    0,  300,  500,  500,  600],  // 台中新診所：9月起
   },
-  actual: {            // 元（Databricks fct_clinic_pos_order_details）
+  actual: {  // 元（Databricks fct_clinic_pos_order_details）；init() 從 Apps Script 更新
     tp: [33344458,22880973,34032987,31810673,31969878,31724033,34335078],
     hc: [11161024, 7798970,12664392, 9032842,10279679,10621106,10690213],
-    kh: [11745797, 9652053,12905791,12591361,12338499,13014746,13193796]
+    kh: [11745797, 9652053,12905791,12591361,12338499,13014746,13193796],
+    tc: []
   }
+};
+
+/* ─────────────────────────────────────────
+   歷史工作天（全域，renderHistReview / renderAnalysis 共用）
+   init() 會從 Apps Script histSessions 覆蓋更新
+───────────────────────────────────────── */
+let WD = {
+  tp: [26,17,26,24,25,25,25],
+  hc: [26,17,26,24,25,25,25],
+  kh: [26,17,26,24,25,25,26]
 };
 
 /* ─────────────────────────────────────────
@@ -875,48 +844,82 @@ const MR = {
 ───────────────────────────────────────── */
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwXAsT6Hj31Z5ul1zipLrNhN52XP0tS_ezp5iP3II-Rd-to_jgkJiOuVw6Qf_ZDg8g/exec';
 
-let AUG_WD     = { tp:13,       hc:13,       kh:13       }; // 已過工作天
-let AUG_SES    = { tp:78,       hc:39,       kh:48       }; // 已過診次
-let AUG_TSES   = { tp:152,      hc:77,       kh:100      }; // 全月排班診次
-let AUG_ACT    = { tp:17803144, hc:8425234,  kh:7557743  }; // 當月實際業績（元）
-let AUG_TGT    = { tp:36000000, hc:14000000, kh:13000000 }; // 當月目標（元）
-let AUG_WD_TOT = { tp:26,       hc:26,       kh:26       }; // 全月工作天
+let AUG_WD     = { tp:13,  hc:13,  kh:13,  tc:0 }; // 已過工作天
+let AUG_SES    = { tp:78,  hc:39,  kh:48,  tc:0 }; // 已過診次
+let AUG_TSES   = { tp:152, hc:77,  kh:100, tc:0 }; // 全月排班診次
+let AUG_ACT    = { tp:17803144, hc:8425234, kh:7557743, tc:0 }; // 當月實際業績（元）
+let AUG_WD_TOT = { tp:26,  hc:26,  kh:26,  tc:0 }; // 全月工作天
+
+// 當月目標（元）—— 從 MR.targets[當月index] 動態計算，預設 8 月
+const _nowM = new Date().getMonth(); // 0-indexed
+let AUG_TGT = {
+  tp: (MR.targets.tp[_nowM] || 0) * 10000,
+  hc: (MR.targets.hc[_nowM] || 0) * 10000,
+  kh: (MR.targets.kh[_nowM] || 0) * 10000,
+  tc: (MR.targets.tc[_nowM] || 0) * 10000,
+};
 
 async function init() {
   try {
     const res  = await fetch(APPS_SCRIPT_URL);
     const json = await res.json();
 
-    // ── 業績快照：更新 MR.actual（1~前月）＋當月 AUG_ACT ──
+    // ── Step 1：診次歷史 → 動態更新 MR.labels / MR.sessions / WD ──
+    // 每月底自動歸檔後，歷史月份列表會自動延長，不用手動改 HTML
+    if (json.histSessions && Object.keys(json.histSessions).length > 0) {
+      const hist   = json.histSessions;
+      const months = Object.keys(hist).map(Number).sort((a,b) => a - b);
+      MR.labels        = months.map(m => m + '月');
+      MR.sessions.tp   = months.map(m => hist[m].tp ? hist[m].tp.sessions  : 0);
+      MR.sessions.hc   = months.map(m => hist[m].hc ? hist[m].hc.sessions  : 0);
+      MR.sessions.kh   = months.map(m => hist[m].kh ? hist[m].kh.sessions  : 0);
+      MR.sessions.tc   = months.map(m => hist[m].tc ? hist[m].tc.sessions  : 0);
+      WD.tp            = months.map(m => hist[m].tp ? hist[m].tp.workdays   : 0);
+      WD.hc            = months.map(m => hist[m].hc ? hist[m].hc.workdays   : 0);
+      WD.kh            = months.map(m => hist[m].kh ? hist[m].kh.workdays   : 0);
+    }
+
+    // ── Step 2：業績快照 → MR.actual（歷史月）+ AUG_ACT（當月）──
     if (json.revenue) {
-      const now = new Date().getMonth(); // 0-indexed：8月 = 7
-      const histLen = MR.labels.length;  // 歷史月份數（目前 7）
+      const now     = new Date().getMonth(); // 0-indexed：8月=7
+      const histLen = MR.labels.length;
       MR.actual.tp = json.revenue.tp.slice(0, histLen);
       MR.actual.hc = json.revenue.hc.slice(0, histLen);
       MR.actual.kh = json.revenue.kh.slice(0, histLen);
+      MR.actual.tc = json.revenue.tc ? json.revenue.tc.slice(0, histLen) : [];
       AUG_ACT.tp = json.revenue.tp[now] || AUG_ACT.tp;
       AUG_ACT.hc = json.revenue.hc[now] || AUG_ACT.hc;
       AUG_ACT.kh = json.revenue.kh[now] || AUG_ACT.kh;
+      AUG_ACT.tc = json.revenue.tc ? (json.revenue.tc[now] || 0) : 0;
+      // 當月目標從 MR.targets 動態取
+      AUG_TGT.tp = (MR.targets.tp[now] || 0) * 10000;
+      AUG_TGT.hc = (MR.targets.hc[now] || 0) * 10000;
+      AUG_TGT.kh = (MR.targets.kh[now] || 0) * 10000;
+      AUG_TGT.tc = (MR.targets.tc[now] || 0) * 10000;
     }
 
-    // ── 診次快照：更新當月進度 ──
+    // ── Step 3：診次快照 → 當月 AUG_SES / AUG_WD ──
     if (json.sessions) {
       const s = json.sessions;
-      AUG_SES.tp    = s.tp.elapsed          || AUG_SES.tp;
-      AUG_SES.hc    = s.hc.elapsed          || AUG_SES.hc;
-      AUG_SES.kh    = s.kh.elapsed          || AUG_SES.kh;
-      AUG_TSES.tp   = s.tp.scheduled        || AUG_TSES.tp;
-      AUG_TSES.hc   = s.hc.scheduled        || AUG_TSES.hc;
-      AUG_TSES.kh   = s.kh.scheduled        || AUG_TSES.kh;
-      AUG_WD.tp     = s.tp.elapsedWorkdays  || AUG_WD.tp;
-      AUG_WD.hc     = s.hc.elapsedWorkdays  || AUG_WD.hc;
-      AUG_WD.kh     = s.kh.elapsedWorkdays  || AUG_WD.kh;
+      AUG_SES.tp    = s.tp.elapsed           || AUG_SES.tp;
+      AUG_SES.hc    = s.hc.elapsed           || AUG_SES.hc;
+      AUG_SES.kh    = s.kh.elapsed           || AUG_SES.kh;
+      AUG_SES.tc    = s.tc ? s.tc.elapsed    || 0 : 0;
+      AUG_TSES.tp   = s.tp.scheduled         || AUG_TSES.tp;
+      AUG_TSES.hc   = s.hc.scheduled         || AUG_TSES.hc;
+      AUG_TSES.kh   = s.kh.scheduled         || AUG_TSES.kh;
+      AUG_TSES.tc   = s.tc ? s.tc.scheduled  || 0 : 0;
+      AUG_WD.tp     = s.tp.elapsedWorkdays   || AUG_WD.tp;
+      AUG_WD.hc     = s.hc.elapsedWorkdays   || AUG_WD.hc;
+      AUG_WD.kh     = s.kh.elapsedWorkdays   || AUG_WD.kh;
+      AUG_WD.tc     = s.tc ? s.tc.elapsedWorkdays    || 0 : 0;
       AUG_WD_TOT.tp = s.tp.scheduledWorkdays || AUG_WD_TOT.tp;
       AUG_WD_TOT.hc = s.hc.scheduledWorkdays || AUG_WD_TOT.hc;
       AUG_WD_TOT.kh = s.kh.scheduledWorkdays || AUG_WD_TOT.kh;
+      AUG_WD_TOT.tc = s.tc ? s.tc.scheduledWorkdays  || 0 : 0;
     }
 
-    // ── 更新 header 時間戳 ──
+    // ── Step 4：更新 header 時間戳 ──
     if (json.updatedAt) {
       const el = document.querySelector('.live-dot')?.parentElement;
       if (el) el.innerHTML = `<span class="live-dot"></span>數據截至 ${json.updatedAt}`;
@@ -925,6 +928,27 @@ async function init() {
     console.warn('⚠️ 資料載入失敗，使用預設值', e);
   }
 
+  // ── Step 5：用 AUG_ACT 更新 KPI 卡片 & 診所卡片（確保和欄位數字一致）──
+  {
+    const fmt1 = v => (v/10000).toFixed(1).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    const tot = AUG_ACT.tp + AUG_ACT.hc + AUG_ACT.kh + (AUG_ACT.tc || 0);
+    const totalEl = document.getElementById('kpi-total-val');
+    if (totalEl) totalEl.innerHTML = `${fmt1(tot)}<span class="kpi-unit">萬</span>`;
+    const noteEl = document.getElementById('kpi-total-note');
+    if (noteEl) {
+      let note = `台北 ${fmt1(AUG_ACT.tp)}萬・新竹 ${fmt1(AUG_ACT.hc)}萬・高雄 ${fmt1(AUG_ACT.kh)}萬`;
+      if (AUG_ACT.tc > 0) note += `・台中 ${fmt1(AUG_ACT.tc)}萬`;
+      noteEl.textContent = note;
+    }
+    const ccTp = document.getElementById('cc-rev-tp');
+    if (ccTp) ccTp.innerHTML = `${fmt1(AUG_ACT.tp)}<span style="font-size:14px;">萬</span>`;
+    const ccHc = document.getElementById('cc-rev-hc');
+    if (ccHc) ccHc.innerHTML = `${fmt1(AUG_ACT.hc)}<span style="font-size:14px;">萬</span>`;
+    const ccKh = document.getElementById('cc-rev-kh');
+    if (ccKh) ccKh.innerHTML = `${fmt1(AUG_ACT.kh)}<span style="font-size:14px;">萬</span>`;
+  }
+
+  renderAugTable();
   renderHistReview();
   renderAnalysis();
 }
@@ -939,12 +963,8 @@ function totalBadge(pct){
 }
 
 function renderHistReview(){
-  const MONTHS = ['1月','2月','3月','4月','5月','6月','7月'];
-  const WD = {
-    tp: [26, 17, 26, 24, 25, 25, 25],
-    hc: [26, 17, 26, 24, 25, 25, 25],
-    kh: [26, 17, 26, 24, 25, 25, 26]
-  };
+  // MONTHS / WD 皆來自全域（init() 從 histSessions 動態更新）
+  const MONTHS = MR.labels;
   const S = MR.sessions, A = MR.actual, T = MR.targets;
   const n = MONTHS.length;
 
@@ -953,10 +973,20 @@ function renderHistReview(){
   const wFmt= v => comma(Math.round(v/10000));  // 千分位，單位萬
   const wd  = (v,d) => (Math.round(v/d/10000*10)/10).toFixed(1);
   const wds = (v,s) => (Math.round(v/s/10000*10)/10).toFixed(1);
-  // 業績 cell：主數字＋小字目標
-  const actCell = (rev, tgtWan) =>
-    `<div style="font-weight:700;line-height:1.3;">${wFmt(rev)}萬</div>`+
-    `<div style="font-size:10px;color:#9ca3af;margin-top:1px;">目標 ${comma(tgtWan)}萬</div>`;
+  // 業績 cell：主數字＋小字目標（isCurrent=true 時為進行中月份，不上色）
+  const actCell = (rev, tgtWan, isCurrent = false) => {
+    const p = (!isCurrent && tgtWan > 0) ? Math.round(rev / (tgtWan * 10000) * 100) : null;
+    const nc = p === null ? '#1a1a1a'
+      : p >= 100 ? '#059669'   // 超標
+      : p >=  90 ? '#1a1a1a'   // 7% 獎金，維持黑
+      : p >=  85 ? '#d97706'   // 5% 獎金
+      :            '#dc2626';  // 無獎金
+    const icon = (p !== null && p >= 100)
+      ? '<span style="font-size:9px;font-weight:900;vertical-align:middle;margin-right:2px;">✓</span>'
+      : '';
+    return `<div style="font-weight:700;line-height:1.3;color:${nc};">${icon}${wFmt(rev)}萬</div>`+
+           `<div style="font-size:10px;color:#9ca3af;margin-top:1px;">目標 ${comma(tgtWan)}萬</div>`;
+  };
   const pct = (a,t) => Math.round(a/t*100);
   const fmtD = d => d>=0
     ? `<span class="ss-pos">+${d}萬</span>`
@@ -1012,19 +1042,19 @@ function renderHistReview(){
     <td rowspan="4" class="ss-metric-lbl">業績</td>
     <td class="ss-clinic-lbl">台北</td>
     ${A.tp.map((v,i)=>`<td style="vertical-align:top;padding-top:6px;">${actCell(v,T.tp[i])}</td>`).join('')}
-    <td class="ss-aug-cell" style="vertical-align:top;padding-top:6px;">${actCell(AUG_ACT.tp,Math.round(AUG_TGT.tp/10000))}</td>
+    <td class="ss-aug-cell" style="vertical-align:top;padding-top:6px;">${actCell(AUG_ACT.tp,Math.round(AUG_TGT.tp/10000),true)}</td>
   </tr>
   <tr><td class="ss-clinic-lbl">新竹</td>
     ${A.hc.map((v,i)=>`<td style="vertical-align:top;padding-top:6px;">${actCell(v,T.hc[i])}</td>`).join('')}
-    <td class="ss-aug-cell" style="vertical-align:top;padding-top:6px;">${actCell(AUG_ACT.hc,Math.round(AUG_TGT.hc/10000))}</td>
+    <td class="ss-aug-cell" style="vertical-align:top;padding-top:6px;">${actCell(AUG_ACT.hc,Math.round(AUG_TGT.hc/10000),true)}</td>
   </tr>
   <tr><td class="ss-clinic-lbl">高雄</td>
     ${A.kh.map((v,i)=>`<td style="vertical-align:top;padding-top:6px;">${actCell(v,T.kh[i])}</td>`).join('')}
-    <td class="ss-aug-cell" style="vertical-align:top;padding-top:6px;">${actCell(AUG_ACT.kh,Math.round(AUG_TGT.kh/10000))}</td>
+    <td class="ss-aug-cell" style="vertical-align:top;padding-top:6px;">${actCell(AUG_ACT.kh,Math.round(AUG_TGT.kh/10000),true)}</td>
   </tr>
   <tr class="ss-subtotal"><td class="ss-clinic-lbl ss-total-lbl">合計</td>
     ${Array.from({length:n},(_,i)=>`<td style="vertical-align:top;padding-top:6px;">${actCell(actSum(i),T.tp[i]+T.hc[i]+T.kh[i])}</td>`).join('')}
-    <td class="ss-aug-cell" style="vertical-align:top;padding-top:6px;">${actCell(augTot,Math.round(augTgtTot/10000))}</td>
+    <td class="ss-aug-cell" style="vertical-align:top;padding-top:6px;">${actCell(augTot,Math.round(augTgtTot/10000),true)}</td>
   </tr>`;
 
   /* ── 目前業績達成率 ── */
@@ -1119,19 +1149,103 @@ function renderHistReview(){
   const cumA   = A.tp.reduce((s,v)=>s+v,0)+A.hc.reduce((s,v)=>s+v,0)+A.kh.reduce((s,v)=>s+v,0);
   const cumTgt = (T.tp.reduce((s,v)=>s+v,0)+T.hc.reduce((s,v)=>s+v,0)+T.kh.reduce((s,v)=>s+v,0))*10000;
   const cum_pct = Math.round(cumA/cumTgt*100);
+  const lastLbl = MR.labels[MR.labels.length - 1]; // 例：'7月' → '8月'（自動）
   const hBadge = document.getElementById('hist-total-badge');
-  hBadge.textContent = `1-7月累計達成 ${cum_pct}%`;
+  hBadge.textContent = `1-${lastLbl}累計達成 ${cum_pct}%`;
   hBadge.className = 'hr-total-badge '+(cum_pct>=100?'hr-green':cum_pct>=90?'hr-amber':'hr-red');
 }
 
 /* ─────────────────────────────────────────
    業績分析小結（動態生成）
 ───────────────────────────────────────── */
-function renderAnalysis(){
-  // ── 基礎常數由全域 AUG_* 提供（init() 從 Apps Script 更新） ──
-  const WD = {
-    tp:[26,17,26,24,25,25,25], hc:[26,17,26,24,25,25,25], kh:[26,17,26,24,25,25,26]
+// ── 當月業績進度表（動態渲染，與 AUG_ACT 同源）──
+function renderAugTable() {
+  const tbody = document.getElementById('aug-table-body');
+  if (!tbody) return;
+
+  const KEYS = ['tp','hc','kh'];
+  const nm = {tp:'台北初日', hc:'新竹初日', kh:'高雄初日'};
+
+  // 格式工具
+  const w1 = v => {
+    const raw = (Math.abs(v)/10000).toFixed(1);
+    const parts = raw.split('.');
+    return parts[0].replace(/\B(?=(\d{3})+(?!\d))/g,',') + '.' + parts[1];
   };
+  const signed = v => (v>=0?'+':'-') + w1(v);
+
+  // 顏色邏輯
+  const deltaClass = d => d >= 0 ? 'c-a' : 'c-b';
+  const pctClass   = (d, tgt) => d >= 0 ? 'c-a' : (Math.abs(d) < tgt*0.06 ? 'c-warn' : 'c-b');
+  const projClass  = (proj, tgt) => proj >= tgt ? 'c-a' : 'c-b';
+
+  let totAct=0, totTgt=0, totSes=0, totTses=0;
+  let rows = '';
+
+  KEYS.forEach(k => {
+    const act  = AUG_ACT[k] || 0;
+    const tgt  = AUG_TGT[k] || 0;
+    const ses  = AUG_SES[k] || 0;
+    const tses = AUG_TSES[k] || 0;
+    const wd   = AUG_WD[k] || 0;
+    const wdt  = AUG_WD_TOT[k] || 0;
+
+    if (!ses || !tses || !tgt) return;
+
+    const todayTgt = tgt * ses / tses;
+    const delta    = act - todayTgt;
+    const pct      = act / tgt * 100;
+    const daily    = wd > 0 ? act / wd : 0;
+    const rps      = ses > 0 ? act / ses : 0;
+    const proj     = tses > 0 ? rps * tses : 0;
+
+    const dc  = deltaClass(delta);
+    const pc  = pctClass(delta, tgt);
+    const prc = projClass(proj, tgt);
+
+    totAct += act; totTgt += tgt; totSes += ses; totTses += tses;
+
+    rows += `<tr>
+      <td>${nm[k]}</td>
+      <td>${w1(tgt)}萬</td>
+      <td>${wd}／${wdt}天</td>
+      <td>${ses}／${tses}</td>
+      <td>${w1(act)}萬</td>
+      <td>${w1(todayTgt)}萬</td>
+      <td class="${dc}">${signed(delta)}萬</td>
+      <td class="${pc}">${pct.toFixed(1)}%</td>
+      <td>${w1(daily)}萬</td>
+      <td>${w1(rps)}萬</td>
+      <td class="${prc}">${w1(proj)}萬</td>
+    </tr>`;
+  });
+
+  // 三院合計列
+  const totTodayTgt = totTgt * totSes / totTses;
+  const totDelta    = totAct - totTodayTgt;
+  const totPct      = totAct / totTgt * 100;
+  const totDaily    = KEYS.reduce((s,k) => s + (AUG_WD[k]>0 ? AUG_ACT[k]/AUG_WD[k] : 0), 0);
+  const totProj     = KEYS.reduce((s,k) => s + (AUG_SES[k]>0&&AUG_TSES[k]>0 ? AUG_ACT[k]/AUG_SES[k]*AUG_TSES[k] : 0), 0);
+
+  rows += `<tr class="total-row">
+    <td>三院合計</td>
+    <td>${w1(totTgt)}萬</td>
+    <td>${AUG_WD.tp}／${AUG_WD_TOT.tp}天</td>
+    <td>${totSes}／${totTses}</td>
+    <td>${w1(totAct)}萬</td>
+    <td>${w1(totTodayTgt)}萬</td>
+    <td class="${deltaClass(totDelta)}">${signed(totDelta)}萬</td>
+    <td class="${pctClass(totDelta, totTgt)}">${totPct.toFixed(1)}%</td>
+    <td>${w1(totDaily)}萬</td>
+    <td>—</td>
+    <td class="${projClass(totProj, totTgt)}">${w1(totProj)}萬</td>
+  </tr>`;
+
+  tbody.innerHTML = rows;
+}
+
+function renderAnalysis(){
+  // ── WD 全域變數（init() 從 histSessions 更新），AUG_* 來自當月快照 ──
   const A = MR.actual, T = MR.targets, S = MR.sessions;
   const nm = { tp:'台北', hc:'新竹', kh:'高雄' };
 
