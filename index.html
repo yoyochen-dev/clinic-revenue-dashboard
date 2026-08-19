@@ -272,13 +272,13 @@
       <div class="cc-metrics">
         <div>
           <div class="cc-m-label">患者人次</div>
-          <div class="cc-m-value">736 人</div>
+          <div class="cc-m-value">1,106 人</div>
           <div class="cc-pt-split">
-            <span class="cc-pt-tag cc-pt-new">初診 167</span>
-            <span class="cc-pt-tag cc-pt-ret">回診 560</span>
+            <span class="cc-pt-tag cc-pt-new">初診 204</span>
+            <span class="cc-pt-tag cc-pt-ret">回診 902</span>
           </div>
         </div>
-        <div><div class="cc-m-label">每人次營收</div><div class="cc-m-value">24,097元</div></div>
+        <div><div class="cc-m-label">每人次營收</div><div class="cc-m-value">17,822元</div></div>
         <div><div class="cc-m-label">排班診次</div><div class="cc-m-value">78/152</div></div>
       </div>
       <div class="prog-header"><span>排班進度</span><span>51% · 診次儀表板</span></div>
@@ -296,13 +296,13 @@
       <div class="cc-metrics">
         <div>
           <div class="cc-m-label">患者人次</div>
-          <div class="cc-m-value">323 人</div>
+          <div class="cc-m-value">444 人</div>
           <div class="cc-pt-split">
-            <span class="cc-pt-tag cc-pt-new">初診 82</span>
-            <span class="cc-pt-tag cc-pt-ret">回診 239</span>
+            <span class="cc-pt-tag cc-pt-new">初診 88</span>
+            <span class="cc-pt-tag cc-pt-ret">回診 356</span>
           </div>
         </div>
-        <div><div class="cc-m-label">每人次營收</div><div class="cc-m-value">25,960元</div></div>
+        <div><div class="cc-m-label">每人次營收</div><div class="cc-m-value">20,188元</div></div>
         <div><div class="cc-m-label">排班診次</div><div class="cc-m-value">39/77</div></div>
       </div>
       <div class="prog-header"><span>排班進度</span><span>51% · 診次儀表板</span></div>
@@ -320,13 +320,13 @@
       <div class="cc-metrics">
         <div>
           <div class="cc-m-label">患者人次</div>
-          <div class="cc-m-value">373 人</div>
+          <div class="cc-m-value">567 人</div>
           <div class="cc-pt-split">
-            <span class="cc-pt-tag cc-pt-new">初診 82</span>
-            <span class="cc-pt-tag cc-pt-ret">回診 286</span>
+            <span class="cc-pt-tag cc-pt-new">初診 94</span>
+            <span class="cc-pt-tag cc-pt-ret">回診 473</span>
           </div>
         </div>
-        <div><div class="cc-m-label">每人次營收</div><div class="cc-m-value">20,178元</div></div>
+        <div><div class="cc-m-label">每人次營收</div><div class="cc-m-value">14,190元</div></div>
         <div><div class="cc-m-label">排班診次</div><div class="cc-m-value">48/100</div></div>
       </div>
       <div class="prog-header"><span>排班進度</span><span>48% · 診次儀表板</span></div>
@@ -727,10 +727,10 @@ let WD = {
 ───────────────────────────────────────── */
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwXAsT6Hj31Z5ul1zipLrNhN52XP0tS_ezp5iP3II-Rd-to_jgkJiOuVw6Qf_ZDg8g/exec';
 
-let AUG_WD     = { tp:13,  hc:13,  kh:13,  tc:0 }; // 已過工作天
-let AUG_SES    = { tp:78,  hc:39,  kh:48,  tc:0 }; // 已過診次
+let AUG_WD     = { tp:15,  hc:15,  kh:15,  tc:0 }; // 已過工作天（截至 2026/08/18）
+let AUG_SES    = { tp:90,  hc:43,  kh:56,  tc:0 }; // 已過診次（截至 2026/08/18）
 let AUG_TSES   = { tp:152, hc:77,  kh:100, tc:0 }; // 全月排班診次
-let AUG_ACT    = { tp:17803144, hc:8425234, kh:7557743, tc:0 }; // 當月實際業績（元）
+let AUG_ACT    = { tp:19709192, hc:8963274, kh:8045985, tc:0 }; // 當月實際業績（元）截至 2026/08/18
 let AUG_WD_TOT = { tp:26,  hc:26,  kh:26,  tc:0 }; // 全月工作天
 
 // 當月目標（元）—— 從 MR.targets[當月index] 動態計算，預設 8 月
