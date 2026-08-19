@@ -272,10 +272,10 @@
       <div class="cc-metrics">
         <div>
           <div class="cc-m-label">患者人次</div>
-          <div class="cc-m-value">1,106 人</div>
+          <div class="cc-m-value" id="cc-patients-tp">1,106 人</div>
           <div class="cc-pt-split">
-            <span class="cc-pt-tag cc-pt-new">初診 204</span>
-            <span class="cc-pt-tag cc-pt-ret">回診 902</span>
+            <span class="cc-pt-tag cc-pt-new" id="cc-new-tp">初診 204</span>
+            <span class="cc-pt-tag cc-pt-ret" id="cc-ret-tp">回診 902</span>
           </div>
         </div>
         <div><div class="cc-m-label">每人次營收</div><div class="cc-m-value">17,822元</div></div>
@@ -296,10 +296,10 @@
       <div class="cc-metrics">
         <div>
           <div class="cc-m-label">患者人次</div>
-          <div class="cc-m-value">444 人</div>
+          <div class="cc-m-value" id="cc-patients-hc">444 人</div>
           <div class="cc-pt-split">
-            <span class="cc-pt-tag cc-pt-new">初診 88</span>
-            <span class="cc-pt-tag cc-pt-ret">回診 356</span>
+            <span class="cc-pt-tag cc-pt-new" id="cc-new-hc">初診 88</span>
+            <span class="cc-pt-tag cc-pt-ret" id="cc-ret-hc">回診 356</span>
           </div>
         </div>
         <div><div class="cc-m-label">每人次營收</div><div class="cc-m-value">20,188元</div></div>
@@ -320,10 +320,10 @@
       <div class="cc-metrics">
         <div>
           <div class="cc-m-label">患者人次</div>
-          <div class="cc-m-value">567 人</div>
+          <div class="cc-m-value" id="cc-patients-kh">567 人</div>
           <div class="cc-pt-split">
-            <span class="cc-pt-tag cc-pt-new">初診 94</span>
-            <span class="cc-pt-tag cc-pt-ret">回診 473</span>
+            <span class="cc-pt-tag cc-pt-new" id="cc-new-kh">初診 94</span>
+            <span class="cc-pt-tag cc-pt-ret" id="cc-ret-kh">回診 473</span>
           </div>
         </div>
         <div><div class="cc-m-label">每人次營收</div><div class="cc-m-value">14,190元</div></div>
@@ -813,6 +813,23 @@ async function init() {
           node.textContent = cutoff;
         });
       }
+    }
+    // ── Step 4.5：患者人次快照 → 當月初診 / 回診（截至前一天）──
+    if (json.patients) {
+      const pidx = new Date().getMonth(); // 0-indexed，8月=7
+      ['tp', 'hc', 'kh'].forEach(key => {
+        const p = json.patients[key];
+        if (!p) return;
+        const total = p.total[pidx]       || 0;
+        const newP  = p.newPatients[pidx] || 0;
+        const retP  = p.returning[pidx]   || 0;
+        const patEl = document.getElementById(`cc-patients-${key}`);
+        if (patEl) patEl.textContent = `${total.toLocaleString()} 人`;
+        const newEl = document.getElementById(`cc-new-${key}`);
+        if (newEl) newEl.textContent = `初診 ${newP.toLocaleString()}`;
+        const retEl = document.getElementById(`cc-ret-${key}`);
+        if (retEl) retEl.textContent = `回診 ${retP.toLocaleString()}`;
+      });
     }
   } catch (e) {
     console.warn('⚠️ 資料載入失敗，使用預設值', e);
