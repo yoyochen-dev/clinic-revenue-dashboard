@@ -14,7 +14,9 @@
     .header h1 { font-size: 18px; font-weight: 700; }
     .header p { font-size: 12px; opacity: 0.6; margin-top: 3px; }
     .header-right { text-align: right; font-size: 12px; opacity: 0.65; line-height: 1.8; }
-    .live-dot { display: inline-block; width: 7px; height: 7px; background: #52b788; border-radius: 50%; margin-right: 5px; animation: blink 2s infinite; }
+    .live-dot { display: inline-block; width: 7px; height: 7px; background: #52b788; border-radius: 50%; margin-right: 5px; }
+    .live-dot.loading { animation: blink 1.2s infinite; }
+    .live-dot.error { background: #f59e0b; }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 
     /* Layout */
@@ -226,7 +228,7 @@
     <p>台北・新竹・高雄｜2026年8月</p>
   </div>
   <div class="header-right">
-    <div><span class="live-dot"></span>數據截至 2026/08/15</div>
+    <div id="data-status"><span class="live-dot loading"></span>正在取得最新資料…</div>
     <div>營收：Databricks（actual_cashflow）&nbsp;·&nbsp;診次：int_clinic_encounters&nbsp;·&nbsp;排班：SimplyBook</div>
   </div>
 </div>
@@ -748,8 +750,47 @@ let AUG_TGT = {
   tc: (MR.targets.tc[_nowM] || 0) * 10000,
 };
 
+function setDataStatus(state, text) {
+  const el = document.getElementById('data-status');
+  if (!el) return;
+  el.innerHTML = `<span class="live-dot ${state}"></span>${text}`;
+}
+
+function isValidDashboardData(data) {
+  const monthIndex = new Date().getMonth();
+  return Boolean(
+    data &&
+    Array.isArray(data.revenue?.tp) &&
+    data.sessions?.tp &&
+    Array.isArray(data.patients?.tp?.total) &&
+    Number(data.patients.tp.total[monthIndex]) > 0
+  );
+}
+
+async function fetchDashboardJson() {
+  let lastError;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      if (attempt > 0) {
+        await new Promise(resolve => setTimeout(resolve, attempt * 900));
+      }
+      const separator = APPS_SCRIPT_URL.includes('?') ? '&' : '?';
+      const res = await fetch(`${APPS_SCRIPT_URL}${separator}_=${Date.now()}`, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`API HTTP ${res.status}`);
+      const text = await res.text();
+      if (!text.trim().startsWith('{')) throw new Error('API 暫時回傳非 JSON 內容');
+      const data = JSON.parse(text);
+      if (!isValidDashboardData(data)) throw new Error('API 資料不完整');
+      return data;
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw lastError || new Error('API 載入失敗');
+}
+
 async function init({ forceNetwork = false } = {}) {
-  const browserCacheKey = 'clinic-revenue-dashboard-data-v1';
+  const browserCacheKey = 'clinic-revenue-dashboard-data-v2';
   let usedBrowserCache = false;
   let json = {};  // 宣告在外層，fetch 失敗時使用空物件當預設值
   try {
@@ -757,9 +798,10 @@ async function init({ forceNetwork = false } = {}) {
       try {
         const cached = JSON.parse(localStorage.getItem(browserCacheKey) || 'null');
         // 先顯示最近一次成功資料，再於背景抓取最新版本。
-        if (cached?.data && Date.now() - cached.savedAt < 24 * 60 * 60 * 1000) {
+        if (cached?.data && isValidDashboardData(cached.data) && Date.now() - cached.savedAt < 24 * 60 * 60 * 1000) {
           json = cached.data;
           usedBrowserCache = true;
+          setDataStatus('loading', `暫存資料截至 ${json.updatedAt || '未知時間'}・更新中…`);
         }
       } catch (cacheError) {
         console.warn('瀏覽器快取無法讀取', cacheError);
@@ -767,9 +809,8 @@ async function init({ forceNetwork = false } = {}) {
     }
 
     if (!usedBrowserCache) {
-      const res = await fetch(APPS_SCRIPT_URL);
-      if (!res.ok) throw new Error(`API HTTP ${res.status}`);
-      json = await res.json();
+      setDataStatus('loading', '正在取得最新資料…');
+      json = await fetchDashboardJson();
       try {
         localStorage.setItem(browserCacheKey, JSON.stringify({ savedAt: Date.now(), data: json }));
       } catch (cacheError) {
@@ -847,8 +888,9 @@ async function init({ forceNetwork = false } = {}) {
 
     // ── Step 4：更新 header 時間戳 ──
     if (json.updatedAt) {
-      const el = document.querySelector('.live-dot')?.parentElement;
-      if (el) el.innerHTML = `<span class="live-dot"></span>數據截至 ${json.updatedAt}`;
+      setDataStatus(usedBrowserCache ? 'loading' : '', usedBrowserCache
+        ? `暫存資料截至 ${json.updatedAt}・更新中…`
+        : `數據截至 ${json.updatedAt}`);
       const cutoff = previousDateFromTimestamp(json.updatedAt);
       if (cutoff) {
         document.querySelectorAll('[data-session-cutoff]').forEach(node => {
@@ -858,6 +900,7 @@ async function init({ forceNetwork = false } = {}) {
     }
   } catch (e) {
     console.warn('⚠️ 資料載入失敗，使用預設值', e);
+    setDataStatus('error', '更新失敗・顯示上次可用資料');
   }
 
   // ── Step 5：用 AUG_ACT 更新 KPI 卡片 & 診所卡片（確保和欄位數字一致）──
