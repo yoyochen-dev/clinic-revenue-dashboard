@@ -748,11 +748,34 @@ let AUG_TGT = {
   tc: (MR.targets.tc[_nowM] || 0) * 10000,
 };
 
-async function init() {
+async function init({ forceNetwork = false } = {}) {
+  const browserCacheKey = 'clinic-revenue-dashboard-data-v1';
+  let usedBrowserCache = false;
   let json = {};  // 宣告在外層，fetch 失敗時使用空物件當預設值
   try {
-    const res  = await fetch(APPS_SCRIPT_URL);
-    json = await res.json();
+    if (!forceNetwork) {
+      try {
+        const cached = JSON.parse(localStorage.getItem(browserCacheKey) || 'null');
+        // 先顯示最近一次成功資料，再於背景抓取最新版本。
+        if (cached?.data && Date.now() - cached.savedAt < 24 * 60 * 60 * 1000) {
+          json = cached.data;
+          usedBrowserCache = true;
+        }
+      } catch (cacheError) {
+        console.warn('瀏覽器快取無法讀取', cacheError);
+      }
+    }
+
+    if (!usedBrowserCache) {
+      const res = await fetch(APPS_SCRIPT_URL);
+      if (!res.ok) throw new Error(`API HTTP ${res.status}`);
+      json = await res.json();
+      try {
+        localStorage.setItem(browserCacheKey, JSON.stringify({ savedAt: Date.now(), data: json }));
+      } catch (cacheError) {
+        console.warn('瀏覽器快取無法寫入', cacheError);
+      }
+    }
 
     // ── Step 1：診次歷史 → 動態更新 MR.labels / MR.sessions / WD ──
     // 每月底自動歸檔後，歷史月份列表會自動延長，不用手動改 HTML
@@ -896,6 +919,11 @@ async function init() {
   renderAugTable();
   renderHistReview();
   renderAnalysis();
+
+  // 使用快取時，畫面已能立即顯示；背景更新完成後再無感重繪一次。
+  if (usedBrowserCache) {
+    setTimeout(() => init({ forceNetwork: true }), 0);
+  }
 }
 
 function syncSessionSummaryCards() {
