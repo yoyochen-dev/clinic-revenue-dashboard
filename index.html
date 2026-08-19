@@ -253,8 +253,8 @@
     </div>
     <div class="kpi">
       <div class="kpi-label">排班診次進度</div>
-      <div class="kpi-value">165<span class="kpi-unit">/329</span></div>
-      <div class="kpi-note">三院已過 50%・診次儀表板截圖</div>
+      <div class="kpi-value" id="kpi-session-val">165<span class="kpi-unit">/329</span></div>
+      <div class="kpi-note" id="kpi-session-note">三院已過 50%・診次快照</div>
     </div>
   </div>
 
@@ -265,7 +265,7 @@
         <span class="cc-name">台北初日</span>
         <div class="cc-pct-wrap">
           <div class="cc-pct-lbl">診次進度</div>
-          <span class="cc-pct">51%</span>
+          <span class="cc-pct" id="cc-pct-tp">51%</span>
         </div>
       </div>
       <div class="cc-revenue" id="cc-rev-tp">—<span style="font-size:14px;">萬</span></div>
@@ -279,17 +279,17 @@
           </div>
         </div>
         <div><div class="cc-m-label">每人次營收</div><div class="cc-m-value">17,822元</div></div>
-        <div><div class="cc-m-label">排班診次</div><div class="cc-m-value">78/152</div></div>
+        <div><div class="cc-m-label">排班診次</div><div class="cc-m-value" id="cc-session-tp">78/152</div></div>
       </div>
-      <div class="prog-header"><span>排班進度</span><span>51% · 診次儀表板</span></div>
-      <div class="prog-bar"><div class="prog-fill" style="width:51%"></div></div>
+      <div class="prog-header"><span>排班進度</span><span id="cc-progress-label-tp">51% · 診次快照</span></div>
+      <div class="prog-bar"><div class="prog-fill" id="cc-progress-fill-tp" style="width:51%"></div></div>
     </div>
     <div class="clinic-card cc-hc">
       <div class="cc-head">
         <span class="cc-name">新竹初日</span>
         <div class="cc-pct-wrap">
           <div class="cc-pct-lbl">診次進度</div>
-          <span class="cc-pct">51%</span>
+          <span class="cc-pct" id="cc-pct-hc">51%</span>
         </div>
       </div>
       <div class="cc-revenue" id="cc-rev-hc">—<span style="font-size:14px;">萬</span></div>
@@ -303,17 +303,17 @@
           </div>
         </div>
         <div><div class="cc-m-label">每人次營收</div><div class="cc-m-value">20,188元</div></div>
-        <div><div class="cc-m-label">排班診次</div><div class="cc-m-value">39/77</div></div>
+        <div><div class="cc-m-label">排班診次</div><div class="cc-m-value" id="cc-session-hc">39/77</div></div>
       </div>
-      <div class="prog-header"><span>排班進度</span><span>51% · 診次儀表板</span></div>
-      <div class="prog-bar"><div class="prog-fill" style="width:51%"></div></div>
+      <div class="prog-header"><span>排班進度</span><span id="cc-progress-label-hc">51% · 診次快照</span></div>
+      <div class="prog-bar"><div class="prog-fill" id="cc-progress-fill-hc" style="width:51%"></div></div>
     </div>
     <div class="clinic-card cc-kh">
       <div class="cc-head">
         <span class="cc-name">高雄初日</span>
         <div class="cc-pct-wrap">
           <div class="cc-pct-lbl">診次進度</div>
-          <span class="cc-pct">48%</span>
+          <span class="cc-pct" id="cc-pct-kh">48%</span>
         </div>
       </div>
       <div class="cc-revenue" id="cc-rev-kh">—<span style="font-size:14px;">萬</span></div>
@@ -327,10 +327,10 @@
           </div>
         </div>
         <div><div class="cc-m-label">每人次營收</div><div class="cc-m-value">14,190元</div></div>
-        <div><div class="cc-m-label">排班診次</div><div class="cc-m-value">48/100</div></div>
+        <div><div class="cc-m-label">排班診次</div><div class="cc-m-value" id="cc-session-kh">48/100</div></div>
       </div>
-      <div class="prog-header"><span>排班進度</span><span>48% · 診次儀表板</span></div>
-      <div class="prog-bar"><div class="prog-fill" style="width:48%"></div></div>
+      <div class="prog-header"><span>排班進度</span><span id="cc-progress-label-kh">48% · 診次快照</span></div>
+      <div class="prog-bar"><div class="prog-fill" id="cc-progress-fill-kh" style="width:48%"></div></div>
     </div>
   </div>
 
@@ -785,22 +785,22 @@ async function init() {
     // ── Step 3：診次快照 → 當月 AUG_SES / AUG_WD ──
     if (json.sessions) {
       const s = json.sessions;
-      AUG_SES.tp    = s.tp.elapsed           || AUG_SES.tp;
-      AUG_SES.hc    = s.hc.elapsed           || AUG_SES.hc;
-      AUG_SES.kh    = s.kh.elapsed           || AUG_SES.kh;
-      AUG_SES.tc    = s.tc ? s.tc.elapsed    || 0 : 0;
-      AUG_TSES.tp   = s.tp.scheduled         || AUG_TSES.tp;
-      AUG_TSES.hc   = s.hc.scheduled         || AUG_TSES.hc;
-      AUG_TSES.kh   = s.kh.scheduled         || AUG_TSES.kh;
-      AUG_TSES.tc   = s.tc ? s.tc.scheduled  || 0 : 0;
-      AUG_WD.tp     = s.tp.elapsedWorkdays   || AUG_WD.tp;
-      AUG_WD.hc     = s.hc.elapsedWorkdays   || AUG_WD.hc;
-      AUG_WD.kh     = s.kh.elapsedWorkdays   || AUG_WD.kh;
-      AUG_WD.tc     = s.tc ? s.tc.elapsedWorkdays    || 0 : 0;
-      AUG_WD_TOT.tp = s.tp.scheduledWorkdays || AUG_WD_TOT.tp;
-      AUG_WD_TOT.hc = s.hc.scheduledWorkdays || AUG_WD_TOT.hc;
-      AUG_WD_TOT.kh = s.kh.scheduledWorkdays || AUG_WD_TOT.kh;
-      AUG_WD_TOT.tc = s.tc ? s.tc.scheduledWorkdays  || 0 : 0;
+      AUG_SES.tp    = s.tp?.elapsed            ?? AUG_SES.tp;
+      AUG_SES.hc    = s.hc?.elapsed            ?? AUG_SES.hc;
+      AUG_SES.kh    = s.kh?.elapsed            ?? AUG_SES.kh;
+      AUG_SES.tc    = s.tc?.elapsed            ?? 0;
+      AUG_TSES.tp   = s.tp?.scheduled          ?? AUG_TSES.tp;
+      AUG_TSES.hc   = s.hc?.scheduled          ?? AUG_TSES.hc;
+      AUG_TSES.kh   = s.kh?.scheduled          ?? AUG_TSES.kh;
+      AUG_TSES.tc   = s.tc?.scheduled          ?? 0;
+      AUG_WD.tp     = s.tp?.elapsedWorkdays    ?? AUG_WD.tp;
+      AUG_WD.hc     = s.hc?.elapsedWorkdays    ?? AUG_WD.hc;
+      AUG_WD.kh     = s.kh?.elapsedWorkdays    ?? AUG_WD.kh;
+      AUG_WD.tc     = s.tc?.elapsedWorkdays    ?? 0;
+      AUG_WD_TOT.tp = s.tp?.scheduledWorkdays  ?? AUG_WD_TOT.tp;
+      AUG_WD_TOT.hc = s.hc?.scheduledWorkdays  ?? AUG_WD_TOT.hc;
+      AUG_WD_TOT.kh = s.kh?.scheduledWorkdays  ?? AUG_WD_TOT.kh;
+      AUG_WD_TOT.tc = s.tc?.scheduledWorkdays  ?? 0;
     }
 
     // ── Step 4：更新 header 時間戳 ──
@@ -837,12 +837,45 @@ async function init() {
       const ts = json.revenueUpdatedAt || '';
       tsEl.textContent = ts ? `業績快照：${ts}（每日凌晨更新）` : '業績快照更新時間未知';
     }
+
+    // 上方診次 KPI 與三院卡片原本是寫死值；統一改由診次快照更新。
+    syncSessionSummaryCards();
   }
 
   renderProjCards();
   renderAugTable();
   renderHistReview();
   renderAnalysis();
+}
+
+function syncSessionSummaryCards() {
+  const keys = ['tp', 'hc', 'kh'];
+  const totalElapsed = keys.reduce((sum, key) => sum + (Number(AUG_SES[key]) || 0), 0);
+  const totalScheduled = keys.reduce((sum, key) => sum + (Number(AUG_TSES[key]) || 0), 0);
+  const totalPct = totalScheduled > 0 ? Math.round(totalElapsed / totalScheduled * 100) : 0;
+
+  const totalValue = document.getElementById('kpi-session-val');
+  if (totalValue) {
+    totalValue.innerHTML = `${totalElapsed}<span class="kpi-unit">/${totalScheduled}</span>`;
+  }
+  const totalNote = document.getElementById('kpi-session-note');
+  if (totalNote) totalNote.textContent = `三院已過 ${totalPct}%・診次快照`;
+
+  keys.forEach(key => {
+    const elapsed = Number(AUG_SES[key]) || 0;
+    const scheduled = Number(AUG_TSES[key]) || 0;
+    const pct = scheduled > 0 ? Math.round(elapsed / scheduled * 100) : 0;
+    const pctText = `${pct}%`;
+
+    const pctEl = document.getElementById(`cc-pct-${key}`);
+    if (pctEl) pctEl.textContent = pctText;
+    const sessionEl = document.getElementById(`cc-session-${key}`);
+    if (sessionEl) sessionEl.textContent = `${elapsed}/${scheduled}`;
+    const labelEl = document.getElementById(`cc-progress-label-${key}`);
+    if (labelEl) labelEl.textContent = `${pctText} · 診次快照`;
+    const fillEl = document.getElementById(`cc-progress-fill-${key}`);
+    if (fillEl) fillEl.style.width = `${Math.min(Math.max(pct, 0), 100)}%`;
+  });
 }
 
 function pctBadge(pct){
