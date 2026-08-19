@@ -775,7 +775,17 @@ async function fetchDashboardJson() {
         await new Promise(resolve => setTimeout(resolve, attempt * 900));
       }
       const separator = APPS_SCRIPT_URL.includes('?') ? '&' : '?';
-      const res = await fetch(`${APPS_SCRIPT_URL}${separator}_=${Date.now()}`, { cache: 'no-store' });
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 7000);
+      let res;
+      try {
+        res = await fetch(`${APPS_SCRIPT_URL}${separator}_=${Date.now()}`, {
+          cache: 'no-store',
+          signal: controller.signal,
+        });
+      } finally {
+        clearTimeout(timeoutId);
+      }
       if (!res.ok) throw new Error(`API HTTP ${res.status}`);
       const text = await res.text();
       if (!text.trim().startsWith('{')) throw new Error('API 暫時回傳非 JSON 內容');
