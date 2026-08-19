@@ -243,12 +243,12 @@
     </div>
     <div class="kpi">
       <div class="kpi-label">累計患者來診</div>
-      <div class="kpi-value">1,432<span class="kpi-unit">人次</span></div>
+      <div class="kpi-value" id="kpi-patient-val">—<span class="kpi-unit">人次</span></div>
       <div class="kpi-note">已報到且完成看診（state=2）</div>
     </div>
     <div class="kpi">
       <div class="kpi-label">平均每人次營收</div>
-      <div class="kpi-value">23,496<span class="kpi-unit">元</span></div>
+      <div class="kpi-value" id="kpi-revenue-per-patient">—<span class="kpi-unit">元</span></div>
       <div class="kpi-note">三院加總平均</div>
     </div>
     <div class="kpi">
@@ -272,13 +272,13 @@
       <div class="cc-metrics">
         <div>
           <div class="cc-m-label">患者人次</div>
-          <div class="cc-m-value" id="cc-patients-tp">1,106 人</div>
+          <div class="cc-m-value" id="cc-patient-tp">— 人</div>
           <div class="cc-pt-split">
-            <span class="cc-pt-tag cc-pt-new" id="cc-new-tp">初診 204</span>
-            <span class="cc-pt-tag cc-pt-ret" id="cc-ret-tp">回診 902</span>
+            <span class="cc-pt-tag cc-pt-new" id="cc-new-tp">初診 —</span>
+            <span class="cc-pt-tag cc-pt-ret" id="cc-returning-tp">回診 —</span>
           </div>
         </div>
-        <div><div class="cc-m-label">每人次營收</div><div class="cc-m-value">17,822元</div></div>
+        <div><div class="cc-m-label">每人次營收</div><div class="cc-m-value" id="cc-rpp-tp">—元</div></div>
         <div><div class="cc-m-label">排班診次</div><div class="cc-m-value" id="cc-session-tp">78/152</div></div>
       </div>
       <div class="prog-header"><span>排班進度</span><span id="cc-progress-label-tp">51% · 診次快照</span></div>
@@ -296,13 +296,13 @@
       <div class="cc-metrics">
         <div>
           <div class="cc-m-label">患者人次</div>
-          <div class="cc-m-value" id="cc-patients-hc">444 人</div>
+          <div class="cc-m-value" id="cc-patient-hc">— 人</div>
           <div class="cc-pt-split">
-            <span class="cc-pt-tag cc-pt-new" id="cc-new-hc">初診 88</span>
-            <span class="cc-pt-tag cc-pt-ret" id="cc-ret-hc">回診 356</span>
+            <span class="cc-pt-tag cc-pt-new" id="cc-new-hc">初診 —</span>
+            <span class="cc-pt-tag cc-pt-ret" id="cc-returning-hc">回診 —</span>
           </div>
         </div>
-        <div><div class="cc-m-label">每人次營收</div><div class="cc-m-value">20,188元</div></div>
+        <div><div class="cc-m-label">每人次營收</div><div class="cc-m-value" id="cc-rpp-hc">—元</div></div>
         <div><div class="cc-m-label">排班診次</div><div class="cc-m-value" id="cc-session-hc">39/77</div></div>
       </div>
       <div class="prog-header"><span>排班進度</span><span id="cc-progress-label-hc">51% · 診次快照</span></div>
@@ -320,13 +320,13 @@
       <div class="cc-metrics">
         <div>
           <div class="cc-m-label">患者人次</div>
-          <div class="cc-m-value" id="cc-patients-kh">567 人</div>
+          <div class="cc-m-value" id="cc-patient-kh">— 人</div>
           <div class="cc-pt-split">
-            <span class="cc-pt-tag cc-pt-new" id="cc-new-kh">初診 94</span>
-            <span class="cc-pt-tag cc-pt-ret" id="cc-ret-kh">回診 473</span>
+            <span class="cc-pt-tag cc-pt-new" id="cc-new-kh">初診 —</span>
+            <span class="cc-pt-tag cc-pt-ret" id="cc-returning-kh">回診 —</span>
           </div>
         </div>
-        <div><div class="cc-m-label">每人次營收</div><div class="cc-m-value">14,190元</div></div>
+        <div><div class="cc-m-label">每人次營收</div><div class="cc-m-value" id="cc-rpp-kh">—元</div></div>
         <div><div class="cc-m-label">排班診次</div><div class="cc-m-value" id="cc-session-kh">48/100</div></div>
       </div>
       <div class="prog-header"><span>排班進度</span><span id="cc-progress-label-kh">48% · 診次快照</span></div>
@@ -725,13 +725,19 @@ let WD = {
    當月全域變數（init() 從 Apps Script 更新）
    預設值 = 最近一次已知數字（fetch 失敗時仍可顯示）
 ───────────────────────────────────────── */
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwXAsT6Hj31Z5ul1zipLrNhN52XP0tS_ezp5iP3II-Rd-to_jgkJiOuVw6Qf_ZDg8g/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx4_tZukK_poowvvBCYoV1wygn-wStEVOHTel7oyC3w1_g3ZPcLKHWtGmzM_T8nw50/exec';
 
 let AUG_WD     = { tp:15,  hc:15,  kh:15,  tc:0 }; // 已過工作天（截至 2026/08/18）
 let AUG_SES    = { tp:90,  hc:43,  kh:56,  tc:0 }; // 已過診次（截至 2026/08/18）
 let AUG_TSES   = { tp:152, hc:77,  kh:100, tc:0 }; // 全月排班診次
 let AUG_ACT    = { tp:19709192, hc:8963274, kh:8045985, tc:0 }; // 當月實際業績（元）截至 2026/08/18
 let AUG_WD_TOT = { tp:26,  hc:26,  kh:26,  tc:0 }; // 全月工作天
+let AUG_PATIENTS = {
+  tp: { total: 0, newPatients: 0, returning: 0 },
+  hc: { total: 0, newPatients: 0, returning: 0 },
+  kh: { total: 0, newPatients: 0, returning: 0 },
+  tc: { total: 0, newPatients: 0, returning: 0 },
+};
 
 // 當月目標（元）—— 從 MR.targets[當月index] 動態計算，預設 8 月
 const _nowM = new Date().getMonth(); // 0-indexed
@@ -782,6 +788,19 @@ async function init() {
       AUG_TGT.tc = (MR.targets.tc[now] || 0) * 10000;
     }
 
+    // ── Step 2.5：患者人次 → 當月總人次／初診／回診 ──
+    if (json.patients) {
+      const now = new Date().getMonth();
+      ['tp', 'hc', 'kh', 'tc'].forEach(key => {
+        const patient = json.patients[key] || {};
+        AUG_PATIENTS[key] = {
+          total: Number(patient.total?.[now]) || 0,
+          newPatients: Number(patient.newPatients?.[now]) || 0,
+          returning: Number(patient.returning?.[now]) || 0,
+        };
+      });
+    }
+
     // ── Step 3：診次快照 → 當月 AUG_SES / AUG_WD ──
     if (json.sessions) {
       const s = json.sessions;
@@ -814,23 +833,6 @@ async function init() {
         });
       }
     }
-    // ── Step 4.5：患者人次快照 → 當月初診 / 回診（截至前一天）──
-    if (json.patients) {
-      const pidx = new Date().getMonth(); // 0-indexed，8月=7
-      ['tp', 'hc', 'kh'].forEach(key => {
-        const p = json.patients[key];
-        if (!p) return;
-        const total = p.total[pidx]       || 0;
-        const newP  = p.newPatients[pidx] || 0;
-        const retP  = p.returning[pidx]   || 0;
-        const patEl = document.getElementById(`cc-patients-${key}`);
-        if (patEl) patEl.textContent = `${total.toLocaleString()} 人`;
-        const newEl = document.getElementById(`cc-new-${key}`);
-        if (newEl) newEl.textContent = `初診 ${newP.toLocaleString()}`;
-        const retEl = document.getElementById(`cc-ret-${key}`);
-        if (retEl) retEl.textContent = `回診 ${retP.toLocaleString()}`;
-      });
-    }
   } catch (e) {
     console.warn('⚠️ 資料載入失敗，使用預設值', e);
   }
@@ -853,6 +855,31 @@ async function init() {
     if (ccHc) ccHc.innerHTML = `${fmt1(AUG_ACT.hc)}<span style="font-size:14px;">萬</span>`;
     const ccKh = document.getElementById('cc-rev-kh');
     if (ccKh) ccKh.innerHTML = `${fmt1(AUG_ACT.kh)}<span style="font-size:14px;">萬</span>`;
+
+    // 患者人次、初回診與每人次營收皆由每日 JSON 更新。
+    const clinicKeys = ['tp', 'hc', 'kh'];
+    const totalPatients = clinicKeys.reduce((sum, key) => sum + AUG_PATIENTS[key].total, 0);
+    const patientKpi = document.getElementById('kpi-patient-val');
+    if (patientKpi) patientKpi.innerHTML = `${fmt(totalPatients)}<span class="kpi-unit">人次</span>`;
+    const revenuePerPatientKpi = document.getElementById('kpi-revenue-per-patient');
+    if (revenuePerPatientKpi) {
+      const avg = totalPatients > 0 ? Math.round(tot / totalPatients) : 0;
+      revenuePerPatientKpi.innerHTML = `${fmt(avg)}<span class="kpi-unit">元</span>`;
+    }
+    clinicKeys.forEach(key => {
+      const patient = AUG_PATIENTS[key];
+      const patientEl = document.getElementById(`cc-patient-${key}`);
+      const newEl = document.getElementById(`cc-new-${key}`);
+      const returningEl = document.getElementById(`cc-returning-${key}`);
+      const rppEl = document.getElementById(`cc-rpp-${key}`);
+      if (patientEl) patientEl.textContent = `${fmt(patient.total)} 人`;
+      if (newEl) newEl.textContent = `初診 ${fmt(patient.newPatients)}`;
+      if (returningEl) returningEl.textContent = `回診 ${fmt(patient.returning)}`;
+      if (rppEl) {
+        const avg = patient.total > 0 ? Math.round(AUG_ACT[key] / patient.total) : 0;
+        rppEl.textContent = `${fmt(avg)}元`;
+      }
+    });
 
     // 顯示業績快照更新時間
     const tsEl = document.getElementById('kpi-rev-ts');
