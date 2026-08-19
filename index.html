@@ -1211,7 +1211,7 @@ function renderAugTable() {
   const pctClass   = (d, tgt) => d >= 0 ? 'c-a' : (Math.abs(d) < tgt*0.06 ? 'c-warn' : 'c-b');
   const projClass  = (proj, tgt) => proj >= tgt ? 'c-a' : 'c-b';
 
-  let totAct=0, totTgt=0, totSes=0, totTses=0;
+  let totAct=0, totTgt=0, totSes=0, totTses=0, totTodayTgt=0;
   let rows = '';
 
   KEYS.forEach(k => {
@@ -1235,7 +1235,12 @@ function renderAugTable() {
     const pc  = pctClass(delta, tgt);
     const prc = projClass(proj, tgt);
 
-    totAct += act; totTgt += tgt; totSes += ses; totTses += tses;
+    totAct += act;
+    totTgt += tgt;
+    totSes += ses;
+    totTses += tses;
+    // 各院目標與排班比例不同，三院應達目標必須逐院計算後再加總。
+    totTodayTgt += todayTgt;
 
     rows += `<tr>
       <td>${nm[k]}</td>
@@ -1253,7 +1258,6 @@ function renderAugTable() {
   });
 
   // 三院合計列
-  const totTodayTgt = totTgt * totSes / totTses;
   const totDelta    = totAct - totTodayTgt;
   const totPct      = totAct / totTgt * 100;
   const totDaily    = KEYS.reduce((s,k) => s + (AUG_WD[k]>0 ? AUG_ACT[k]/AUG_WD[k] : 0), 0);
