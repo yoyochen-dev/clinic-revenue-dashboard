@@ -369,7 +369,7 @@
     <div class="footnote">
       ＊ 每診格均收 = 當前業績 ÷ 已過診次（診格）；與每人次營收（患者人次）定義不同，請勿混用<br>
       ＊ 預估全月業績 = 每診格均收 × 全月排班診次（線性推估，實際可能因剩餘診次組合而有所不同）<br>
-      ＊ 今日應達目標採診次比例法：月目標 × 已過診次 ÷ 全月排班診次；診次來源：Apps Script 診次儀表板（統計至 2026/08/15）
+      ＊ 今日應達目標採診次比例法：月目標 × 已過診次 ÷ 全月排班診次；診次來源：Apps Script 診次儀表板（統計至 <span data-session-cutoff>2026/08/15</span>）
     </div>
   </div>
 
@@ -445,7 +445,7 @@
       <div class="footnote">
         ＊ 患者人次：<code>cofit_bi_prod.int.int_clinic_encounters</code>（state=2 已完成）<br>
         ＊ 醫師營收：<code>cofit_bi_prod.core.fct_clinic_pos_order_details</code>（actual_cashflow，report_month=2026-08）<br>
-        ＊ 排班診次進度：來源為「初日診所｜已過診次儀表板」Apps Script（統計至 2026/08/15）<br>
+        ＊ 排班診次進度：來源為「初日診所｜已過診次儀表板」Apps Script（統計至 <span data-session-cutoff>2026/08/15</span>）<br>
         ＊ SimplyBook（stg_simplybook_schedule_snapshots）的 monthly_booked 為病患預約量，與診次格數定義不同，不宜直接套用<br>
         ＊ 各院「其他未歸屬」為 POS 保健品/客保訂單或無特定醫師認列之金額
       </div>
@@ -807,6 +807,12 @@ async function init() {
     if (json.updatedAt) {
       const el = document.querySelector('.live-dot')?.parentElement;
       if (el) el.innerHTML = `<span class="live-dot"></span>數據截至 ${json.updatedAt}`;
+      const cutoff = previousDateFromTimestamp(json.updatedAt);
+      if (cutoff) {
+        document.querySelectorAll('[data-session-cutoff]').forEach(node => {
+          node.textContent = cutoff;
+        });
+      }
     }
   } catch (e) {
     console.warn('⚠️ 資料載入失敗，使用預設值', e);
@@ -876,6 +882,17 @@ function syncSessionSummaryCards() {
     const fillEl = document.getElementById(`cc-progress-fill-${key}`);
     if (fillEl) fillEl.style.width = `${Math.min(Math.max(pct, 0), 100)}%`;
   });
+}
+
+function previousDateFromTimestamp(timestamp) {
+  const match = String(timestamp || '').match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})/);
+  if (!match) return '';
+  const date = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+  date.setDate(date.getDate() - 1);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}/${month}/${day}`;
 }
 
 function pctBadge(pct){
@@ -1136,7 +1153,7 @@ function renderProjCards() {
     cards += `
     <div class="mp-clinic ${cls[k]}">
       <div class="mp-clinic-name">${nm[k]}</div>
-      <div class="mp-target-lbl">月目標：<strong>${w1(tgt)}萬</strong></div>
+      <div class="mp-target-lbl">月目標：<strong>${w1(tgt)}萬</strong><span style="color:#9ca3af;font-weight:500;margin-left:6px;">（目前應達 ${pctTgt.toFixed(1)}%）</span></div>
       <div class="mp-rate-row">
         <div>
           <div class="mp-m-lbl" style="margin-bottom:2px;">目標達成率</div>
