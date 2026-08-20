@@ -57,6 +57,7 @@
     .cc-pt-split { display: flex; gap: 6px; margin-top: 3px; flex-wrap: wrap; }
     .cc-pt-tag { font-size: 10px; padding: 1px 6px; border-radius: 8px; font-weight: 600; white-space: nowrap; }
     .cc-pt-new  { background: #dbeafe; color: #1d4ed8; }
+    .cc-pt-ret  { background: #f3f4f6; color: #6b7280; }
     .prog-header { display: flex; justify-content: space-between; font-size: 11px; color: #9ca3af; margin-bottom: 5px; }
     .prog-bar { height: 5px; background: #e5e7eb; border-radius: 3px; }
     .prog-fill { height: 100%; border-radius: 3px; }
@@ -276,6 +277,7 @@
           <div class="cc-m-value" id="cc-patient-tp">— 人</div>
           <div class="cc-pt-split">
             <span class="cc-pt-tag cc-pt-new" id="cc-new-tp">初診 —</span>
+            <span class="cc-pt-tag cc-pt-ret" id="cc-returning-tp">回診 —</span>
           </div>
         </div>
         <div><div class="cc-m-label">每人次營收</div><div class="cc-m-value" id="cc-rpp-tp">—元</div></div>
@@ -299,6 +301,7 @@
           <div class="cc-m-value" id="cc-patient-hc">— 人</div>
           <div class="cc-pt-split">
             <span class="cc-pt-tag cc-pt-new" id="cc-new-hc">初診 —</span>
+            <span class="cc-pt-tag cc-pt-ret" id="cc-returning-hc">回診 —</span>
           </div>
         </div>
         <div><div class="cc-m-label">每人次營收</div><div class="cc-m-value" id="cc-rpp-hc">—元</div></div>
@@ -322,6 +325,7 @@
           <div class="cc-m-value" id="cc-patient-kh">— 人</div>
           <div class="cc-pt-split">
             <span class="cc-pt-tag cc-pt-new" id="cc-new-kh">初診 —</span>
+            <span class="cc-pt-tag cc-pt-ret" id="cc-returning-kh">回診 —</span>
           </div>
         </div>
         <div><div class="cc-m-label">每人次營收</div><div class="cc-m-value" id="cc-rpp-kh">—元</div></div>
@@ -928,7 +932,7 @@ async function init({ forceNetwork = false } = {}) {
     const ccKh = document.getElementById('cc-rev-kh');
     if (ccKh) ccKh.innerHTML = `${fmt1(AUG_ACT.kh)}<span style="font-size:14px;">萬</span>`;
 
-    // 患者人次、初診與每人次營收皆由每日 JSON 更新；回診目前不顯示。
+    // 患者人次、初回診與每人次營收皆由每日 JSON 更新。
     const clinicKeys = ['tp', 'hc', 'kh'];
     const totalPatients = clinicKeys.reduce((sum, key) => sum + AUG_PATIENTS[key].total, 0);
     const patientKpi = document.getElementById('kpi-patient-val');
@@ -942,9 +946,11 @@ async function init({ forceNetwork = false } = {}) {
       const patient = AUG_PATIENTS[key];
       const patientEl = document.getElementById(`cc-patient-${key}`);
       const newEl = document.getElementById(`cc-new-${key}`);
+      const returningEl = document.getElementById(`cc-returning-${key}`);
       const rppEl = document.getElementById(`cc-rpp-${key}`);
       if (patientEl) patientEl.textContent = `${fmt(patient.total)} 人`;
       if (newEl) newEl.textContent = `初診 ${fmt(patient.newPatients)}`;
+      if (returningEl) returningEl.textContent = `回診 ${fmt(patient.returning)}`;
       if (rppEl) {
         const avg = patient.total > 0 ? Math.round(AUG_ACT[key] / patient.total) : 0;
         rppEl.textContent = `${fmt(avg)}元`;
