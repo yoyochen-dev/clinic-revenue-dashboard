@@ -979,6 +979,22 @@ async function init({ forceNetwork = false } = {}) {
   }
 }
 
+// JSON 每日更新後，已開啟的儀表板也會自動同步，不必手動重新整理。
+// 定時更新與切回分頁可能同時發生，因此用同一個 Promise 避免重複請求。
+let dashboardRefreshPromise = null;
+function refreshDashboard() {
+  if (dashboardRefreshPromise) return dashboardRefreshPromise;
+  dashboardRefreshPromise = init({ forceNetwork: true })
+    .finally(() => { dashboardRefreshPromise = null; });
+  return dashboardRefreshPromise;
+}
+
+const DASHBOARD_REFRESH_INTERVAL_MS = 5 * 60 * 1000;
+setInterval(refreshDashboard, DASHBOARD_REFRESH_INTERVAL_MS);
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') refreshDashboard();
+});
+
 function syncSessionSummaryCards() {
   const keys = ['tp', 'hc', 'kh'];
   const totalElapsed = keys.reduce((sum, key) => sum + (Number(AUG_SES[key]) || 0), 0);
