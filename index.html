@@ -273,7 +273,7 @@
       <div class="cc-revenue" id="cc-rev-tp">—<span style="font-size:14px;">萬</span></div>
       <div class="cc-metrics">
         <div>
-          <div class="cc-m-label">患者人次</div>
+          <div class="cc-m-label">患者人數</div>
           <div class="cc-m-value" id="cc-patient-tp">— 人</div>
           <div class="cc-pt-split">
             <span class="cc-pt-tag cc-pt-new" id="cc-new-tp">初診 —</span>
@@ -297,7 +297,7 @@
       <div class="cc-revenue" id="cc-rev-hc">—<span style="font-size:14px;">萬</span></div>
       <div class="cc-metrics">
         <div>
-          <div class="cc-m-label">患者人次</div>
+          <div class="cc-m-label">患者人數</div>
           <div class="cc-m-value" id="cc-patient-hc">— 人</div>
           <div class="cc-pt-split">
             <span class="cc-pt-tag cc-pt-new" id="cc-new-hc">初診 —</span>
@@ -321,7 +321,7 @@
       <div class="cc-revenue" id="cc-rev-kh">—<span style="font-size:14px;">萬</span></div>
       <div class="cc-metrics">
         <div>
-          <div class="cc-m-label">患者人次</div>
+          <div class="cc-m-label">患者人數</div>
           <div class="cc-m-value" id="cc-patient-kh">— 人</div>
           <div class="cc-pt-split">
             <span class="cc-pt-tag cc-pt-new" id="cc-new-kh">初診 —</span>
@@ -369,7 +369,7 @@
       <tbody id="aug-table-body"></tbody>
     </table>
     <div class="footnote">
-      ＊ 每診格均收 = 當前業績 ÷ 已過診次（診格）；與每人次營收（患者人次）定義不同，請勿混用<br>
+      ＊ 每診格均收 = 當前業績 ÷ 已過診次（診格）；與每人次營收（患者人數）定義不同，請勿混用<br>
       ＊ 預估全月業績 = 每診格均收 × 全月排班診次（線性推估，實際可能因剩餘診次組合而有所不同）<br>
       ＊ 今日應達目標採診次比例法：月目標 × 已過診次 ÷ 全月排班診次；診次來源：Apps Script 診次儀表板（統計至 <span data-session-cutoff>2026/08/15</span>）
     </div>
@@ -408,7 +408,7 @@
   <!-- Charts（移至業績總覽後） -->
   <div class="chart-row">
     <div class="chart-card">
-      <div class="chart-title">每日營收 × 患者人次</div>
+      <div class="chart-title">每日營收 × 患者人數</div>
       <div class="chart-sub">柱狀圖 = 當日淨營收（元）· 折線 = 患者來診人次（右軸）</div>
       <div class="tab-row">
         <button class="tab-btn active" onclick="switchTrend(this,'all')">三院合計</button>
@@ -420,7 +420,7 @@
     </div>
     <div class="chart-card">
       <div class="chart-title">每診次平均營收（客單價趨勢）</div>
-      <div class="chart-sub">當日營收 ÷ 當日患者人次・僅計有診次日</div>
+      <div class="chart-sub">當日營收 ÷ 當日患者人數・僅計有診次日</div>
       <div style="height:42px;"></div>
       <div class="chart-wrap"><canvas id="rpeChart"></canvas></div>
     </div>
@@ -430,7 +430,7 @@
   <div class="doctor-card">
     <div class="collapse-header" onclick="toggleCollapse('doc-body')">
       <div>
-        <div class="chart-title" style="margin-bottom:2px;">醫師績效：月累計營收 × 患者人次 × 排班進度</div>
+        <div class="chart-title" style="margin-bottom:2px;">醫師績效：月累計營收 × 患者人數 × 排班進度</div>
         <div class="chart-sub" style="margin-bottom:0;">8/1–8/15 累計 · 排班進度 = 已過診次/全月排班（來源：診次儀表板；台北有明細，新竹・高雄待補）
           <span class="collapse-hint" id="doc-hint">（點擊展開）</span>
         </div>
@@ -445,7 +445,7 @@
       </div>
       <div id="doc-table"></div>
       <div class="footnote">
-        ＊ 患者人次：<code>cofit_bi_prod.int.int_clinic_encounters</code>（state=2 已完成）<br>
+        ＊ 患者人數：<code>cofit_bi_prod.int.int_clinic_encounters</code>（state=2 已完成）<br>
         ＊ 醫師營收：<code>cofit_bi_prod.core.fct_clinic_pos_order_details</code>（actual_cashflow，report_month=2026-08）<br>
         ＊ 排班診次進度：來源為「初日診所｜已過診次儀表板」Apps Script（統計至 <span data-session-cutoff>2026/08/15</span>）<br>
         ＊ SimplyBook（stg_simplybook_schedule_snapshots）的 monthly_booked 為病患預約量，與診次格數定義不同，不宜直接套用<br>
@@ -489,7 +489,7 @@
         ＊ 上班天數(當前) = 已過診次 ÷ 2；整數 = 整天、0.5 = 半天（僅早或晚單診格）<br>
         ＊ 當月總上班天數 = 全月排班診次 ÷ 2（預計整月班表）<br>
         ＊ 總和／平均列：上班天數欄位為診所整體開診天數；平均日營收 = 各醫師合計營收 ÷ 各醫師合計上班天數（加權）<br>
-        ＊ 平均單診標紅代表低於院所當前加權平均，供督導參考；診次組合（科別、療程）不同，請交叉比對患者人次<br>
+        ＊ 平均單診標紅代表低於院所當前加權平均，供督導參考；診次組合（科別、療程）不同，請交叉比對患者人數<br>
         ＊ 本表「總和」僅統計有明確歸屬醫師的部分，「其他未歸屬」（保健品/無特定認列金額）不列入計算：台北 +216.4萬、新竹 +61.4萬、高雄 +94.8萬
       </div>
     </div>
@@ -558,7 +558,7 @@ let tChart = new Chart(document.getElementById('trendChart'),{
       {type:'bar',label:'當日營收',data:allRev,
        backgroundColor:allRev.map(r=>r>=3000000?'rgba(27,67,50,.9)':'rgba(45,106,79,.75)'),
        borderRadius:4,yAxisID:'y',order:2},
-      {type:'line',label:'患者人次',data:allVis,
+      {type:'line',label:'患者人數',data:allVis,
        borderColor:'#1B4332',backgroundColor:'transparent',
        pointBackgroundColor:'#1B4332',pointRadius:4,tension:.3,yAxisID:'y2',order:1}
     ]
@@ -652,7 +652,7 @@ function renderDoc(key){
   const docs=DOCS[key];
   const maxRev=Math.max(...docs.filter(d=>d.n!=='其他未歸屬').map(d=>d.rev));
   let h=`<table><thead><tr>
-    <th>醫師</th><th>累計營收</th><th>患者人次</th><th>每人次營收</th>
+    <th>醫師</th><th>累計營收</th><th>患者人數</th><th>每人次營收</th>
     <th>排班進度</th>
   </tr></thead><tbody>`;
   docs.forEach(d=>{
