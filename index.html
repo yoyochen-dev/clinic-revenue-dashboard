@@ -901,12 +901,17 @@ async function init({ forceNetwork = false } = {}) {
       AUG_WD_TOT.tc = s.tc?.scheduledWorkdays  ?? 0;
     }
 
+    // ── Step 3.5：醫師排班快照 → 每天自動更新至前一天 ──
+    if (json.doctorSessions) {
+      syncDoctorScheduleData(json.doctorSessions);
+    }
+
     // ── Step 4：更新 header 時間戳 ──
     if (json.updatedAt) {
       setDataStatus(usedBrowserCache ? 'loading' : '', usedBrowserCache
         ? `暫存資料截至 ${json.updatedAt}・更新中…`
         : `數據截至 ${json.updatedAt}`);
-      const cutoff = previousDateFromTimestamp(json.updatedAt);
+      const cutoff = json.doctorSessions?.cutoffDate || previousDateFromTimestamp(json.updatedAt);
       if (cutoff) {
         document.querySelectorAll('[data-session-cutoff]').forEach(node => {
           node.textContent = cutoff;
@@ -1638,6 +1643,29 @@ function syncDoctorRevenueData(doctorRevenue) {
       };
     });
     SA[key].splice(0, SA[key].length, ...nextSA);
+  });
+}
+
+function syncDoctorScheduleData(doctorSessions) {
+  const clinics = doctorSessions.clinics || doctorSessions;
+  ['tp', 'hc', 'kh'].forEach(key => {
+    const rows = Array.isArray(clinics[key]) ? clinics[key] : [];
+    if (!rows.length) return;
+    const scheduleMap = new Map(rows.map(row => [row.name, row]));
+
+    DOCS[key].forEach(doctor => {
+      const schedule = scheduleMap.get(doctor.n);
+      if (!schedule) return;
+      doctor.sd = Number(schedule.elapsed) || 0;
+      doctor.st = Number(schedule.scheduled) || 0;
+    });
+
+    SA[key].forEach(doctor => {
+      const schedule = scheduleMap.get(doctor.n);
+      if (!schedule) return;
+      doctor.sd = Number(schedule.elapsed) || 0;
+      doctor.st = Number(schedule.scheduled) || 0;
+    });
   });
 }
 
