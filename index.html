@@ -431,7 +431,7 @@
     <div class="collapse-header" onclick="toggleCollapse('doc-body')">
       <div>
         <div class="chart-title" style="margin-bottom:2px;">醫師績效：月累計營收 × 患者人數 × 排班進度</div>
-        <div class="chart-sub" style="margin-bottom:0;">8/1–8/15 累計 · 排班進度 = 已過診次/全月排班（來源：診次儀表板；台北有明細，新竹・高雄待補）
+        <div class="chart-sub" style="margin-bottom:0;">8月累計 · 排班進度統計至昨日（營收：每日 JSON；排班：診次儀表板）
           <span class="collapse-hint" id="doc-hint">（點擊展開）</span>
         </div>
       </div>
@@ -449,7 +449,7 @@
         ＊ 醫師營收：<code>cofit_bi_prod.core.fct_clinic_pos_order_details</code>（actual_cashflow，report_month=2026-08）<br>
         ＊ 排班診次進度：來源為「初日診所｜已過診次儀表板」Apps Script（統計至 <span data-session-cutoff>2026/08/15</span>）<br>
         ＊ SimplyBook（stg_simplybook_schedule_snapshots）的 monthly_booked 為病患預約量，與診次格數定義不同，不宜直接套用<br>
-        ＊ 各院「其他未歸屬」為 POS 保健品/客保訂單或無特定醫師認列之金額
+        ＊ 各院「其他未歸屬」＝院所總營收－有明確歸屬醫師的營收
       </div>
     </div>
   </div>
@@ -490,7 +490,7 @@
         ＊ 當月總上班天數 = 全月排班診次 ÷ 2（預計整月班表）<br>
         ＊ 總和／平均列：上班天數欄位為診所整體開診天數；平均日營收 = 各醫師合計營收 ÷ 各醫師合計上班天數（加權）<br>
         ＊ 平均單診標紅代表低於院所當前加權平均，供督導參考；診次組合（科別、療程）不同，請交叉比對患者人數<br>
-        ＊ 本表「總和」僅統計有明確歸屬醫師的部分，「其他未歸屬」（保健品/無特定認列金額）不列入計算：台北 +216.4萬、新竹 +61.4萬、高雄 +94.8萬
+        ＊ 本表「總和」僅統計有明確歸屬醫師的部分；「其他未歸屬」不列入醫師平均計算
       </div>
     </div>
   </div>
@@ -516,30 +516,30 @@ const VIS = {
 const C = { tp:'#2D6A4F', hc:'#40916C', kh:'#52B788' };
 
 // 台北/新竹/高雄：sd=已過診次, st=全月診次
-// 來源：初日診所已過診次儀表板 Apps Script（統計至 2026/08/15）
+// 來源：初日診所已過診次儀表板（統計至 2026/08/22）
 const DOCS = {
   tp:[
-    {n:'陳威龍',rev:3853962,enc:194,sd:18,st:36},
-    {n:'鄧雯心',rev:3213003,enc:149,sd:16,st:24},
-    {n:'周建安',rev:1714064,enc:99, sd:14,st:32},
-    {n:'許芷瑜',rev:2533207,enc:107,sd:12,st:24},
-    {n:'宋晏仁',rev:2929260,enc:113,sd:10,st:22},
+    {n:'陳威龍',rev:3853962,enc:194,sd:28,st:36},
+    {n:'鄧雯心',rev:3213003,enc:149,sd:16,st:22},
+    {n:'周建安',rev:1714064,enc:99, sd:22,st:32},
+    {n:'許芷瑜',rev:2533207,enc:107,sd:18,st:24},
+    {n:'宋晏仁',rev:2929260,enc:113,sd:15,st:20},
     {n:'李唐越',rev:640271, enc:40, sd:4, st:6},
-    {n:'王律婷',rev:189300, enc:16, sd:2, st:4},
-    {n:'魏士航',rev:496332, enc:18, sd:2, st:4},
+    {n:'王律婷',rev:189300, enc:16, sd:5, st:5},
+    {n:'魏士航',rev:496332, enc:18, sd:4, st:4},
     {n:'其他未歸屬',rev:2164315,enc:null,sd:null,st:null},
   ],
   hc:[
-    {n:'魏士航',rev:3787516,enc:166,sd:13,st:31},
-    {n:'王律婷',rev:3073832,enc:116,sd:14,st:22},
-    {n:'楊德仁',rev:909990, enc:37, sd:12,st:24},
+    {n:'魏士航',rev:3787516,enc:166,sd:18,st:30},
+    {n:'王律婷',rev:3073832,enc:116,sd:20,st:22},
+    {n:'楊德仁',rev:909990, enc:37, sd:18,st:24},
     {n:'其他未歸屬',rev:614466,enc:null,sd:null,st:null},
   ],
   kh:[
-    {n:'李思賢',rev:1713307,enc:102,sd:16,st:32},
-    {n:'劉曜增',rev:1289949,enc:63, sd:12,st:26},
-    {n:'范亞萱',rev:935729, enc:61, sd:12,st:24},
-    {n:'李唐越',rev:2639368,enc:147,sd:8, st:18},
+    {n:'李思賢',rev:1713307,enc:102,sd:22,st:32},
+    {n:'劉曜增',rev:1289949,enc:63, sd:23,st:30},
+    {n:'范亞萱',rev:935729, enc:61, sd:18,st:24},
+    {n:'李唐越',rev:2639368,enc:147,sd:9, st:15},
     {n:'其他未歸屬',rev:947765,enc:null,sd:null,st:null},
   ]
 };
@@ -800,7 +800,7 @@ async function fetchDashboardJson() {
 }
 
 async function init({ forceNetwork = false } = {}) {
-  const browserCacheKey = 'clinic-revenue-dashboard-data-v2';
+  const browserCacheKey = 'clinic-revenue-dashboard-data-v3';
   let usedBrowserCache = false;
   let json = {};  // 宣告在外層，fetch 失敗時使用空物件當預設值
   try {
@@ -873,6 +873,11 @@ async function init({ forceNetwork = false } = {}) {
           returning: Number(patient.returning?.[now]) || 0,
         };
       });
+    }
+
+    // ── Step 2.6：醫師當月營收 → 更新兩個 8 月醫師分析版位 ──
+    if (json.doctorRevenue) {
+      syncDoctorRevenueData(json.doctorRevenue);
     }
 
     // ── Step 3：診次快照 → 當月 AUG_SES / AUG_WD ──
@@ -1570,27 +1575,71 @@ function renderAnalysis(){
 /* ── 8月（即時） ── */
 const SA = {
   tp:[
-    {n:'宋晏仁', sd:10, st:22, rev:2929260},
-    {n:'鄧雯心', sd:16, st:24, rev:3213003},
-    {n:'陳威龍', sd:18, st:36, rev:3853962},
-    {n:'許芷瑜', sd:12, st:24, rev:2533207},
-    {n:'王律婷', sd:2,  st:4,  rev:189300},
-    {n:'周建安', sd:14, st:32, rev:1714064},
-    {n:'魏士航', sd:2,  st:4,  rev:496332},
+    {n:'宋晏仁', sd:15, st:20, rev:2929260},
+    {n:'鄧雯心', sd:16, st:22, rev:3213003},
+    {n:'陳威龍', sd:28, st:36, rev:3853962},
+    {n:'許芷瑜', sd:18, st:24, rev:2533207},
+    {n:'王律婷', sd:5,  st:5,  rev:189300},
+    {n:'周建安', sd:22, st:32, rev:1714064},
+    {n:'魏士航', sd:4,  st:4,  rev:496332},
     {n:'李唐越', sd:4,  st:6,  rev:640271},
   ],
   hc:[
-    {n:'魏士航', sd:13, st:31, rev:3787516},
-    {n:'王律婷', sd:14, st:22, rev:3073832},
-    {n:'楊德仁', sd:12, st:24, rev:909990},
+    {n:'魏士航', sd:18, st:30, rev:3787516},
+    {n:'王律婷', sd:20, st:22, rev:3073832},
+    {n:'楊德仁', sd:18, st:24, rev:909990},
   ],
   kh:[
-    {n:'李思賢', sd:16, st:32, rev:1713307},
-    {n:'劉曜增', sd:12, st:26, rev:1289949},
-    {n:'范亞萱', sd:12, st:24, rev:935729},
-    {n:'李唐越', sd:8,  st:18, rev:2639368},
+    {n:'李思賢', sd:22, st:32, rev:1713307},
+    {n:'劉曜增', sd:23, st:30, rev:1289949},
+    {n:'范亞萱', sd:18, st:24, rev:935729},
+    {n:'李唐越', sd:9,  st:15, rev:2639368},
   ]
 };
+
+function syncDoctorRevenueData(doctorRevenue) {
+  ['tp', 'hc', 'kh'].forEach(key => {
+    const rows = Array.isArray(doctorRevenue[key]) ? doctorRevenue[key] : [];
+    if (!rows.length) return;
+
+    const docMeta = new Map(
+      DOCS[key].filter(d => d.n !== '其他未歸屬').map(d => [d.n, d])
+    );
+    const saMeta = new Map(SA[key].map(d => [d.n, d]));
+    const doctorTotal = rows.reduce((sum, row) => sum + (Number(row.revenue) || 0), 0);
+
+    const nextDocs = rows.map(row => {
+      const old = docMeta.get(row.name) || {};
+      return {
+        n: row.name,
+        rev: Number(row.revenue) || 0,
+        enc: old.enc ?? null,
+        sd: old.sd ?? null,
+        st: old.st ?? null,
+        orders: Number(row.orders) || 0,
+      };
+    });
+    nextDocs.push({
+      n: '其他未歸屬',
+      rev: Math.max(0, (Number(AUG_ACT[key]) || 0) - doctorTotal),
+      enc: null,
+      sd: null,
+      st: null,
+    });
+    DOCS[key].splice(0, DOCS[key].length, ...nextDocs);
+
+    const nextSA = rows.map(row => {
+      const old = saMeta.get(row.name) || docMeta.get(row.name) || {};
+      return {
+        n: row.name,
+        rev: Number(row.revenue) || 0,
+        sd: old.sd ?? null,
+        st: old.st ?? null,
+      };
+    });
+    SA[key].splice(0, SA[key].length, ...nextSA);
+  });
+}
 
 /* ── 1–7月歷史資料 ── */
 const HIST_DATA = {
@@ -1714,7 +1763,7 @@ const CLINIC_DAYS_FULL = 26;
 const MONTH_LABELS = {
   '01':'2026年1月','02':'2026年2月','03':'2026年3月','04':'2026年4月',
   '05':'2026年5月','06':'2026年6月','07':'2026年7月',
-  '08':'2026年8月（8/1–8/15 即時）'
+  '08':'2026年8月（即時）'
 };
 
 let currentSAMonth  = '08';
@@ -1731,7 +1780,7 @@ function renderSA(clinicKey){
 
   // 副標題
   const note = isCurrent
-    ? '（HIS 診療；不含 POS 保健品）'
+    ? '（actual_cashflow；含明確醫師歸屬的營收）'
     : '（HIS 診療；不含 POS，較試算表低 ~15–20%）';
   document.getElementById('sa-subtitle').textContent = MONTH_LABELS[currentSAMonth] + ' ' + note;
 
@@ -1742,8 +1791,8 @@ function renderSA(clinicKey){
   }
 
   const totalRev = data.reduce((s,d)=>s+d.rev, 0);
-  const totalSd  = data.reduce((s,d)=>s+d.sd,  0);
-  const avgRps   = totalRev / totalSd;
+  const totalSd  = data.reduce((s,d)=>s+(Number(d.sd)||0), 0);
+  const avgRps   = totalSd > 0 ? totalRev / totalSd : 0;
 
   const extraTh = isCurrent
     ? `<th>診次<br><span style="font-size:10px;font-weight:400">(當前)</span></th>
@@ -1759,26 +1808,27 @@ function renderSA(clinicKey){
   </tr></thead><tbody>`;
 
   data.forEach(d=>{
-    const rps   = d.rev / d.sd;
-    const days  = d.sd / 2;
-    const rpd   = d.rev / days;
-    const below = rps < avgRps;
+    const hasSchedule = Number(d.sd) > 0;
+    const rps   = hasSchedule ? d.rev / d.sd : null;
+    const days  = hasSchedule ? d.sd / 2 : null;
+    const rpd   = days ? d.rev / days : null;
+    const below = rps !== null && rps < avgRps;
     const extraTd = isCurrent
-      ? `<td>${d.sd}</td><td>${fmtDays(days)}</td><td>${fmtDays(d.st/2)}</td>`
-      : `<td>${d.sd}</td><td>${fmtDays(days)}</td>`;
+      ? `<td>${d.sd ?? '—'}</td><td>${days === null ? '—' : fmtDays(days)}</td><td>${d.st == null ? '—' : fmtDays(d.st/2)}</td>`
+      : `<td>${d.sd ?? '—'}</td><td>${days === null ? '—' : fmtDays(days)}</td>`;
     h += `<tr>
       <td class="doc-name">${d.n} 醫師</td>
       ${extraTd}
       <td>${fmtW(d.rev)}</td>
-      <td style="font-weight:600;${below?'color:#dc2626':''}">${fmt(Math.round(rps))}</td>
-      <td>${fmt(Math.round(rpd))}</td>
+      <td style="font-weight:600;${below?'color:#dc2626':''}">${rps === null ? '—' : fmt(Math.round(rps))}</td>
+      <td>${rpd === null ? '—' : fmt(Math.round(rpd))}</td>
     </tr>`;
   });
 
   const totalDays = totalSd / 2;
-  const totalRpd  = totalRev / totalDays;
+  const totalRpd  = totalDays > 0 ? totalRev / totalDays : 0;
   const totalTd = isCurrent
-    ? `<td>${totalSd}</td><td>${CLINIC_DAYS_NOW}</td><td>${CLINIC_DAYS_FULL}</td>`
+    ? `<td>${totalSd}</td><td>${AUG_WD[clinicKey] ?? '—'}</td><td>${AUG_WD_TOT[clinicKey] ?? '—'}</td>`
     : `<td>${totalSd}</td><td>${fmtDays(totalDays)}</td>`;
   h += `<tr style="background:#f0fdf4;font-weight:700;">
     <td>總和／平均</td>${totalTd}
