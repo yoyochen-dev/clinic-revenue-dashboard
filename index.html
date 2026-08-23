@@ -676,7 +676,9 @@ function renderDoc(key){
   h+='</tbody></table>';
   document.getElementById('doc-table').innerHTML=h;
 }
+let currentDocClinic = 'tp';
 function switchDoc(btn,key){
+  currentDocClinic = key;
   document.querySelectorAll('.dtab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   renderDoc(key);
@@ -800,7 +802,7 @@ async function fetchDashboardJson() {
 }
 
 async function init({ forceNetwork = false } = {}) {
-  const browserCacheKey = 'clinic-revenue-dashboard-data-v3';
+  const browserCacheKey = 'clinic-revenue-dashboard-data-v4';
   let usedBrowserCache = false;
   let json = {};  // 宣告在外層，fetch 失敗時使用空物件當預設值
   try {
@@ -982,6 +984,8 @@ async function init({ forceNetwork = false } = {}) {
   renderAugTable();
   renderHistReview();
   renderAnalysis();
+  renderDoc(currentDocClinic);
+  renderSA(currentSAClinic);
 
   // 使用快取時，畫面已能立即顯示；背景更新完成後再無感重繪一次。
   if (usedBrowserCache) {
