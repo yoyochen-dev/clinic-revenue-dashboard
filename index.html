@@ -78,6 +78,19 @@
 
     /* Doctor Table */
     .doctor-card { background: white; border-radius: 12px; padding: 20px; }
+    .sa-all-clinics { display:grid; gap:16px; }
+    .sa-matrix-wrap { overflow-x:auto; border:1px solid #e5e7eb; border-radius:10px; }
+    .sa-matrix-title { padding:9px 12px; font-size:13px; font-weight:800; color:#173d30; border-bottom:1px solid #e5e7eb; }
+    .sa-matrix-title.tp { background:#e4f1eb; }
+    .sa-matrix-title.hc { background:#edf7df; }
+    .sa-matrix-title.kh { background:#e3efff; }
+    .sa-matrix { min-width:760px; margin:0; }
+    .sa-matrix th, .sa-matrix td { white-space:nowrap; text-align:right; }
+    .sa-matrix th:first-child, .sa-matrix td:first-child { position:sticky; left:0; z-index:1; text-align:left; background:#fff; box-shadow:1px 0 #e5e7eb; }
+    .sa-matrix thead th:first-child { z-index:2; background:#f8faf9; }
+    .sa-matrix .sa-muted-row td { background:#f1f3f2; }
+    .sa-matrix .sa-muted-row td:first-child { background:#f1f3f2; }
+    .sa-matrix .sa-total { background:#f0fdf4; font-weight:700; }
     /* Collapsible sections */
     .collapse-header { display:flex; align-items:center; justify-content:space-between; cursor:pointer; user-select:none; }
     .collapse-toggle { font-size:18px; color:#9ca3af; transition:transform .25s; line-height:1; padding:0 4px; }
@@ -477,12 +490,6 @@
         <button class="dtab month-tab" onclick="switchMonth(this,'06')">6月</button>
         <button class="dtab month-tab" onclick="switchMonth(this,'07')">7月</button>
         <button class="dtab month-tab active" onclick="switchMonth(this,'08')">8月（即時）</button>
-      </div>
-      <!-- 院所切換 -->
-      <div class="dtab-row">
-        <button class="dtab sa-tab active" onclick="switchSA(this,'tp')">台北初日</button>
-        <button class="dtab sa-tab" onclick="switchSA(this,'hc')">新竹初日</button>
-        <button class="dtab sa-tab" onclick="switchSA(this,'kh')">高雄初日</button>
       </div>
       <div id="sa-table"></div>
       <div class="footnote">
@@ -985,7 +992,7 @@ async function init({ forceNetwork = false } = {}) {
   renderHistReview();
   renderAnalysis();
   renderDoc(currentDocClinic);
-  renderSA(currentSAClinic);
+  renderSA();
 
   // 使用快取時，畫面已能立即顯示；背景更新完成後再無感重繪一次。
   if (usedBrowserCache) {
@@ -1799,96 +1806,71 @@ const MONTH_LABELS = {
 };
 
 let currentSAMonth  = '08';
-let currentSAClinic = 'tp';
 
 function fmtDays(n){
   return n === Math.floor(n) ? String(n) : n.toFixed(1);
 }
 
-function renderSA(clinicKey){
-  currentSAClinic = clinicKey;
+function renderSA(){
   const isCurrent = currentSAMonth === '08';
-  const data = isCurrent ? SA[clinicKey] : ((HIST_DATA[currentSAMonth]||{})[clinicKey]||[]);
-
-  // 副標題
   const note = isCurrent
     ? '（actual_cashflow；含明確醫師歸屬的營收）'
     : '（HIS 診療；不含 POS，較試算表低 ~15–20%）';
   document.getElementById('sa-subtitle').textContent = MONTH_LABELS[currentSAMonth] + ' ' + note;
+  const clinicNames = {tp:'台北初日', hc:'新竹初日', kh:'高雄初日'};
+  const sections = ['tp','hc','kh'].map(clinicKey => {
+    const data = isCurrent ? SA[clinicKey] : ((HIST_DATA[currentSAMonth]||{})[clinicKey]||[]);
+    if(!data.length) return '';
 
-  if(!data.length){
-    document.getElementById('sa-table').innerHTML =
-      '<p style="padding:24px;color:#9ca3af;text-align:center;">本月此院所無資料</p>';
-    return;
-  }
+    const totalRev = data.reduce((s,d)=>s+d.rev, 0);
+    const totalSd  = data.reduce((s,d)=>s+(Number(d.sd)||0), 0);
+    const totalDays = totalSd / 2;
+    const avgRps = totalSd > 0 ? totalRev / totalSd : 0;
+    const avgRpd = totalDays > 0 ? totalRev / totalDays : 0;
+    const doctorCells = fn => data.map(fn).join('');
 
-  const totalRev = data.reduce((s,d)=>s+d.rev, 0);
-  const totalSd  = data.reduce((s,d)=>s+(Number(d.sd)||0), 0);
-  const avgRps   = totalSd > 0 ? totalRev / totalSd : 0;
+    const row = (label, cells, total, className='') =>
+      `<tr class="${className}"><td>${label}</td>${cells}<td class="sa-total">${total}</td></tr>`;
 
-  const extraTh = isCurrent
-    ? `<th>診次<br><span style="font-size:10px;font-weight:400">(當前)</span></th>
-       <th>上班天數<br><span style="font-size:10px;font-weight:400">(當前)</span></th>
-       <th>當月總<br><span style="font-size:10px;font-weight:400">上班天數</span></th>`
-    : `<th>診次<br><span style="font-size:10px;font-weight:400">(全月)</span></th>
-       <th>上班天數<br><span style="font-size:10px;font-weight:400">(全月)</span></th>`;
+    let table = `<div class="sa-matrix-wrap">
+      <div class="sa-matrix-title ${clinicKey}">${clinicNames[clinicKey]}</div>
+      <table class="sa-matrix"><thead><tr><th>醫師</th>
+        ${doctorCells(d=>`<th>${d.n}</th>`)}<th class="sa-total">總和／平均</th>
+      </tr></thead><tbody>`;
 
-  let h = `<table><thead><tr>
-    <th style="text-align:left">醫師</th>
-    ${extraTh}
-    <th>營收</th><th>平均單診營收</th><th>平均日營收</th>
-  </tr></thead><tbody>`;
+    table += row('診次', doctorCells(d=>`<td>${d.sd ?? '—'}</td>`), totalSd);
+    table += row(isCurrent?'上班天數（當前）':'上班天數',
+      doctorCells(d=>`<td>${Number(d.sd)>0?fmtDays(d.sd/2):'—'}</td>`),
+      isCurrent ? (AUG_WD[clinicKey] ?? '—') : fmtDays(totalDays), 'sa-muted-row');
+    if(isCurrent){
+      table += row('當月總上班天數',
+        doctorCells(d=>`<td>${d.st==null?'—':fmtDays(d.st/2)}</td>`),
+        AUG_WD_TOT[clinicKey] ?? '—', 'sa-muted-row');
+    }
+    table += row('營收', doctorCells(d=>`<td>${fmtW(d.rev)}</td>`), fmtW(totalRev));
+    table += row('平均單診營收', doctorCells(d=>{
+      const value = Number(d.sd)>0 ? d.rev/d.sd : null;
+      return `<td style="${value!==null&&value<avgRps?'color:#dc2626;font-weight:700;':''}">${value===null?'—':fmt(Math.round(value))}</td>`;
+    }), fmt(Math.round(avgRps)));
+    table += row('平均日營收', doctorCells(d=>{
+      const value = Number(d.sd)>0 ? d.rev/(d.sd/2) : null;
+      return `<td style="${value!==null&&value<avgRpd?'color:#dc2626;font-weight:700;':''}">${value===null?'—':fmt(Math.round(value))}</td>`;
+    }), fmt(Math.round(avgRpd)));
+    table += '</tbody></table></div>';
+    return table;
+  }).join('');
 
-  data.forEach(d=>{
-    const hasSchedule = Number(d.sd) > 0;
-    const rps   = hasSchedule ? d.rev / d.sd : null;
-    const days  = hasSchedule ? d.sd / 2 : null;
-    const rpd   = days ? d.rev / days : null;
-    const below = rps !== null && rps < avgRps;
-    const extraTd = isCurrent
-      ? `<td>${d.sd ?? '—'}</td><td>${days === null ? '—' : fmtDays(days)}</td><td>${d.st == null ? '—' : fmtDays(d.st/2)}</td>`
-      : `<td>${d.sd ?? '—'}</td><td>${days === null ? '—' : fmtDays(days)}</td>`;
-    h += `<tr>
-      <td class="doc-name">${d.n} 醫師</td>
-      ${extraTd}
-      <td>${fmtW(d.rev)}</td>
-      <td style="font-weight:600;${below?'color:#dc2626':''}">${rps === null ? '—' : fmt(Math.round(rps))}</td>
-      <td>${rpd === null ? '—' : fmt(Math.round(rpd))}</td>
-    </tr>`;
-  });
-
-  const totalDays = totalSd / 2;
-  const totalRpd  = totalDays > 0 ? totalRev / totalDays : 0;
-  const totalTd = isCurrent
-    ? `<td>${totalSd}</td><td>${AUG_WD[clinicKey] ?? '—'}</td><td>${AUG_WD_TOT[clinicKey] ?? '—'}</td>`
-    : `<td>${totalSd}</td><td>${fmtDays(totalDays)}</td>`;
-  h += `<tr style="background:#f0fdf4;font-weight:700;">
-    <td>總和／平均</td>${totalTd}
-    <td>${fmtW(totalRev)}</td>
-    <td>${fmt(Math.round(avgRps))}</td>
-    <td>${fmt(Math.round(totalRpd))}</td>
-  </tr>`;
-
-  h += '</tbody></table>';
-  document.getElementById('sa-table').innerHTML = h;
-}
-
-function switchSA(btn, key){
-  document.querySelectorAll('.sa-tab').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  renderSA(key);
+  document.getElementById('sa-table').innerHTML = `<div class="sa-all-clinics">${sections}</div>`;
 }
 
 function switchMonth(btn, month){
   document.querySelectorAll('.month-tab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   currentSAMonth = month;
-  // 重設 clinic tab 回台北
-  document.querySelectorAll('.sa-tab').forEach((b,i)=>b.classList.toggle('active',i===0));
-  renderSA('tp');
+  renderSA();
 }
 
-renderSA('tp');
+renderSA();
 init(); // 從 Apps Script 載入最新業績 & 診次，完成後重繪 renderHistReview / renderAnalysis
 </script>
 </body>
