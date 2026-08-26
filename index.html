@@ -809,7 +809,7 @@ async function fetchDashboardJson() {
 }
 
 async function init({ forceNetwork = false } = {}) {
-  const browserCacheKey = 'clinic-revenue-dashboard-data-v5';
+  const browserCacheKey = 'clinic-revenue-dashboard-data-v4';
   let usedBrowserCache = false;
   let json = {};  // 宣告在外層，fetch 失敗時使用空物件當預設值
   try {
@@ -817,7 +817,7 @@ async function init({ forceNetwork = false } = {}) {
       try {
         const cached = JSON.parse(localStorage.getItem(browserCacheKey) || 'null');
         // 先顯示最近一次成功資料，再於背景抓取最新版本。
-        const taipeiToday = new Intl.DateTimeFormat('en-CA', {\n          timeZone: 'Asia/Taipei', year: 'numeric', month: '2-digit', day: '2-digit'\n        }).format(new Date()).replaceAll('-', '/');\n        const cacheIsFromToday = cached?.data?.revenueUpdatedAt === taipeiToday;\n        if (cached?.data && isValidDashboardData(cached.data) && cacheIsFromToday && Date.now() - cached.savedAt < 24 * 60 * 60 * 1000) {
+        if (cached?.data && isValidDashboardData(cached.data) && Date.now() - cached.savedAt < 24 * 60 * 60 * 1000) {
           json = cached.data;
           usedBrowserCache = true;
           setDataStatus('loading', `暫存資料截至 ${json.updatedAt || '未知時間'}・更新中…`);
