@@ -242,7 +242,7 @@
   </div>
   <div class="header-right">
     <div id="data-status"><span class="live-dot loading"></span>正在取得最新資料…</div>
-    <div>營收：Databricks（actual_cashflow）&nbsp;·&nbsp;診次：int_clinic_encounters&nbsp;·&nbsp;排班：SimplyBook</div>
+    <div>業績與患者：每日 JSON（Databricks）&nbsp;·&nbsp;診次與排班：Apps Script 診次快照</div>
   </div>
 </div>
 
@@ -917,10 +917,11 @@ async function init({ forceNetwork = false } = {}) {
 
     // ── Step 4：更新 header 時間戳 ──
     if (json.updatedAt) {
-      setDataStatus(usedBrowserCache ? 'loading' : '', usedBrowserCache
-        ? `暫存資料截至 ${json.updatedAt}・更新中…`
-        : `數據截至 ${json.updatedAt}`);
+      const revenueCutoff = json.revenueUpdatedAt || '未知日期';
       const cutoff = json.doctorSessions?.cutoffDate || previousDateFromTimestamp(json.updatedAt);
+      setDataStatus(usedBrowserCache ? 'loading' : '', usedBrowserCache
+        ? `業績統計至 ${revenueCutoff}・診次統計至 ${cutoff || '未知日期'}・更新中…`
+        : `業績統計至 ${revenueCutoff}・診次統計至 ${cutoff || '未知日期'}・系統更新 ${json.updatedAt}`);
       if (cutoff) {
         document.querySelectorAll('[data-session-cutoff]').forEach(node => {
           node.textContent = cutoff;
