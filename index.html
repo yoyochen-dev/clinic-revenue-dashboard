@@ -238,7 +238,7 @@
 <div class="header">
   <div>
     <h1>初日診所｜業績追蹤儀表板</h1>
-    <p>台北・新竹・高雄｜2026年8月</p>
+    <p>台北・新竹・高雄｜2026年<span data-report-month>8</span>月</p>
   </div>
   <div class="header-right">
     <div id="data-status"><span class="live-dot loading"></span>正在取得最新資料…</div>
@@ -352,7 +352,7 @@
   <!-- 8月業績進度 -->
   <div class="mp-card">
     <div class="mp-section-head">
-      <div class="mp-section-title">8月業績達成進度</div>
+      <div class="mp-section-title"><span data-report-month>8</span>月業績達成進度</div>
       <span class="mp-section-badge" id="mp-total-badge">載入中…</span>
     </div>
     <div class="chart-sub" id="mp-subtitle">載入中…</div>
@@ -400,7 +400,7 @@
   <!-- 1-8月業績總覽 -->
   <div class="hist-review-card">
     <div class="mp-section-head">
-      <div class="mp-section-title">1–8月業績總覽</div>
+      <div class="mp-section-title">1–<span data-report-month>8</span>月業績總覽</div>
       <span id="hist-total-badge" class="hr-total-badge hr-red" style="font-size:12px;"></span>
     </div>
     <div id="hist-review-sub" style="font-size:11px;color:#9ca3af;margin-bottom:14px;">
@@ -444,7 +444,7 @@
     <div class="collapse-header" onclick="toggleCollapse('doc-body')">
       <div>
         <div class="chart-title" style="margin-bottom:2px;">醫師績效：月累計營收 × 患者人數 × 排班進度</div>
-        <div class="chart-sub" style="margin-bottom:0;">8月累計 · 排班進度統計至昨日（營收：每日 JSON；排班：診次儀表板）
+        <div class="chart-sub" style="margin-bottom:0;"><span data-report-month>8</span>月累計 · 排班進度統計至昨日（營收：每日 JSON；排班：診次儀表板）
           <span class="collapse-hint" id="doc-hint">（點擊展開）</span>
         </div>
       </div>
@@ -489,7 +489,7 @@
         <button class="dtab month-tab" onclick="switchMonth(this,'05')">5月</button>
         <button class="dtab month-tab" onclick="switchMonth(this,'06')">6月</button>
         <button class="dtab month-tab" onclick="switchMonth(this,'07')">7月</button>
-        <button class="dtab month-tab active" onclick="switchMonth(this,'08')">8月（即時）</button>
+        <button class="dtab month-tab active" onclick="switchMonth(this,'08')"><span data-report-month>8</span>月（即時）</button>
       </div>
       <div id="sa-table"></div>
       <div class="footnote">
@@ -751,7 +751,11 @@ let AUG_PATIENTS = {
 };
 
 // 當月目標（元）—— 從 MR.targets[當月index] 動態計算，預設 8 月
-const _nowM = new Date().getMonth(); // 0-indexed
+const _today = new Date();
+let REPORT_MONTH_INDEX = _today.getDate() === 1
+  ? (_today.getMonth() + 11) % 12
+  : _today.getMonth();
+const _nowM = REPORT_MONTH_INDEX; // 0-indexed；每月 1 日預設仍顯示上月
 let AUG_TGT = {
   tp: (MR.targets.tp[_nowM] || 0) * 10000,
   hc: (MR.targets.hc[_nowM] || 0) * 10000,
@@ -765,8 +769,23 @@ function setDataStatus(state, text) {
   el.innerHTML = `<span class="live-dot ${state}"></span>${text}`;
 }
 
+function getReportingMonthIndex(data) {
+  const match = String(data?.revenueUpdatedAt || '').match(/^\d{4}\/(\d{2})/);
+  const parsed = match ? Number(match[1]) - 1 : NaN;
+  return Number.isInteger(parsed) && parsed >= 0 && parsed <= 11
+    ? parsed
+    : REPORT_MONTH_INDEX;
+}
+
+function updateReportingMonthLabels(monthIndex) {
+  const month = monthIndex + 1;
+  document.querySelectorAll('[data-report-month]').forEach(node => {
+    node.textContent = month;
+  });
+}
+
 function isValidDashboardData(data) {
-  const monthIndex = new Date().getMonth();
+  const monthIndex = getReportingMonthIndex(data);
   return Boolean(
     data &&
     Array.isArray(data.revenue?.tp) &&
@@ -817,11 +836,11 @@ async function init({ forceNetwork = false } = {}) {
       try {
         const cached = JSON.parse(localStorage.getItem(browserCacheKey) || 'null');
         // 先顯示最近一次成功資料，再於背景抓取最新版本。
-        const taipeiToday = new Intl.DateTimeFormat('en-CA', {
+        const expectedRevenueDate = new Intl.DateTimeFormat('en-CA', {
           timeZone: 'Asia/Taipei', year: 'numeric', month: '2-digit', day: '2-digit'
-        }).format(new Date()).replaceAll('-', '/');
-        const cacheIsFromToday = cached?.data?.revenueUpdatedAt === taipeiToday;
-        if (cached?.data && isValidDashboardData(cached.data) && cacheIsFromToday && Date.now() - cached.savedAt < 24 * 60 * 60 * 1000) {
+        }).format(new Date(Date.now() - 24 * 60 * 60 * 1000)).replaceAll('-', '/');
+        const cacheIsLatest = cached?.data?.revenueUpdatedAt === expectedRevenueDate;
+        if (cached?.data && isValidDashboardData(cached.data) && cacheIsLatest && Date.now() - cached.savedAt < 24 * 60 * 60 * 1000) {
           json = cached.data;
           usedBrowserCache = true;
           setDataStatus('loading', `暫存資料截至 ${json.updatedAt || '未知時間'}・更新中…`);
@@ -841,6 +860,9 @@ async function init({ forceNetwork = false } = {}) {
       }
     }
 
+    REPORT_MONTH_INDEX = getReportingMonthIndex(json);
+    updateReportingMonthLabels(REPORT_MONTH_INDEX);
+
     // ── Step 1：診次歷史 → 動態更新 MR.labels / MR.sessions / WD ──
     // 每月底自動歸檔後，歷史月份列表會自動延長，不用手動改 HTML
     if (json.histSessions && Object.keys(json.histSessions).length > 0) {
@@ -858,7 +880,7 @@ async function init({ forceNetwork = false } = {}) {
 
     // ── Step 2：業績快照 → MR.actual（歷史月）+ AUG_ACT（當月）──
     if (json.revenue) {
-      const now     = new Date().getMonth(); // 0-indexed：8月=7
+      const now     = REPORT_MONTH_INDEX;
       const histLen = MR.labels.length;
       MR.actual.tp = json.revenue.tp.slice(0, histLen);
       MR.actual.hc = json.revenue.hc.slice(0, histLen);
@@ -877,7 +899,7 @@ async function init({ forceNetwork = false } = {}) {
 
     // ── Step 2.5：患者人次 → 當月總人次／初診／回診 ──
     if (json.patients) {
-      const now = new Date().getMonth();
+      const now = REPORT_MONTH_INDEX;
       ['tp', 'hc', 'kh', 'tc'].forEach(key => {
         const patient = json.patients[key] || {};
         AUG_PATIENTS[key] = {
@@ -1076,6 +1098,7 @@ function renderHistReview(){
   const MONTHS = MR.labels;
   const S = MR.sessions, A = MR.actual, T = MR.targets;
   const n = MONTHS.length;
+  const reportMonth = REPORT_MONTH_INDEX + 1;
 
   const comma = n => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,',');
   const w   = v => Math.round(v/10000);
@@ -1113,7 +1136,7 @@ function renderHistReview(){
     <th class="ss-th-metric">指標</th>
     <th class="ss-th-clinic">院所</th>
     ${MONTHS.map(m=>`<th>${m}</th>`).join('')}
-    <th class="ss-th-aug">8月<br>當前業績</th>
+    <th class="ss-th-aug">${reportMonth}月<br>當前業績</th>
   </tr></thead><tbody>`;
 
   /* ── 上班天數 ── */
@@ -1821,7 +1844,10 @@ function renderSA(){
   const note = isCurrent
     ? '（actual_cashflow；含明確醫師歸屬的營收）'
     : '（HIS 診療；不含 POS，較試算表低 ~15–20%）';
-  document.getElementById('sa-subtitle').textContent = MONTH_LABELS[currentSAMonth] + ' ' + note;
+  const monthLabel = isCurrent
+    ? `2026年${REPORT_MONTH_INDEX + 1}月（即時）`
+    : MONTH_LABELS[currentSAMonth];
+  document.getElementById('sa-subtitle').textContent = monthLabel + ' ' + note;
   const clinicNames = {tp:'台北初日', hc:'新竹初日', kh:'高雄初日'};
   const sections = ['tp','hc','kh'].map(clinicKey => {
     const data = isCurrent ? SA[clinicKey] : ((HIST_DATA[currentSAMonth]||{})[clinicKey]||[]);
