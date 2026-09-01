@@ -451,6 +451,10 @@
       <span class="collapse-toggle" id="doc-arrow">▸</span>
     </div>
     <div class="collapse-body is-collapsed" id="doc-body">
+      <div class="dtab-row" id="doc-month-tabs" style="flex-wrap:wrap;gap:5px;margin-bottom:8px;">
+        <button class="dtab doc-month-tab active" data-month="08" onclick="switchDocMonth(this,'08')">8月（完整月）</button>
+        <button class="dtab doc-month-tab" data-month="09" onclick="switchDocMonth(this,'09')">9月（即時）</button>
+      </div>
       <div class="dtab-row">
         <button class="dtab active" onclick="switchDoc(this,'tp')">台北初日</button>
         <button class="dtab" onclick="switchDoc(this,'hc')">新竹初日</button>
@@ -489,7 +493,8 @@
         <button class="dtab month-tab" onclick="switchMonth(this,'05')">5月</button>
         <button class="dtab month-tab" onclick="switchMonth(this,'06')">6月</button>
         <button class="dtab month-tab" onclick="switchMonth(this,'07')">7月</button>
-        <button class="dtab month-tab active" onclick="switchMonth(this,'08')"><span data-report-month>8</span>月（即時）</button>
+        <button class="dtab month-tab active" data-month="08" onclick="switchMonth(this,'08')">8月（完整月）</button>
+        <button class="dtab month-tab" data-month="09" onclick="switchMonth(this,'09')">9月（即時）</button>
       </div>
       <div id="sa-table"></div>
       <div class="footnote">
@@ -549,6 +554,39 @@ const DOCS = {
     {n:'李唐越',rev:2639368,enc:147,sd:9, st:15},
     {n:'其他未歸屬',rev:947765,enc:null,sd:null,st:null},
   ]
+};
+
+// 2026 年 8 月最終快照。此資料與即時 DOCS 分開保存，9 月 JSON 更新時不會覆蓋。
+const DOC_ARCHIVE = {
+  '08': {
+    tp: [
+      {n:'陳威龍',rev:8166624,enc:334,newPatients:89,returning:245,sd:36,st:36},
+      {n:'鄧雯心',rev:6643181,enc:220,newPatients:37,returning:183,sd:24,st:24},
+      {n:'宋晏仁',rev:6149458,enc:205,newPatients:43,returning:162,sd:22,st:22},
+      {n:'許芷瑜',rev:5088164,enc:183,newPatients:43,returning:140,sd:24,st:24},
+      {n:'周建安',rev:4794369,enc:188,newPatients:55,returning:133,sd:32,st:32},
+      {n:'李唐越',rev:1529159,enc:54,newPatients:11,returning:43,sd:6,st:6},
+      {n:'魏士航',rev:1185534,enc:39,newPatients:12,returning:27,sd:4,st:4},
+      {n:'王律婷',rev:559835,enc:27,newPatients:11,returning:16,sd:4,st:4},
+      {n:'范亞萱',rev:6090,enc:null,newPatients:null,returning:null,sd:null,st:null},
+      {n:'其他未歸屬',rev:63505,enc:null,newPatients:null,returning:null,sd:null,st:null},
+    ],
+    hc: [
+      {n:'魏士航',rev:7428948,enc:281,newPatients:53,returning:228,sd:31,st:31},
+      {n:'王律婷',rev:4777549,enc:199,newPatients:55,returning:144,sd:22,st:22},
+      {n:'楊德仁',rev:1788130,enc:70,newPatients:38,returning:32,sd:24,st:24},
+      {n:'陳威龍',rev:57540,enc:7,newPatients:0,returning:7,sd:null,st:null},
+      {n:'其他未歸屬',rev:169141,enc:null,newPatients:null,returning:null,sd:null,st:null},
+    ],
+    kh: [
+      {n:'李唐越',rev:5533815,enc:240,newPatients:25,returning:215,sd:16,st:16},
+      {n:'李思賢',rev:3724583,enc:162,newPatients:49,returning:113,sd:32,st:32},
+      {n:'劉曜增',rev:2552259,enc:112,newPatients:31,returning:81,sd:24,st:24},
+      {n:'范亞萱',rev:2403693,enc:122,newPatients:41,returning:81,sd:24,st:24},
+      {n:'鄧雯心',rev:20940,enc:null,newPatients:null,returning:null,sd:null,st:null},
+      {n:'其他未歸屬',rev:0,enc:null,newPatients:null,returning:null,sd:null,st:null},
+    ]
+  }
 };
 
 const fmt = n => Math.round(n).toLocaleString('zh-TW');
@@ -656,7 +694,14 @@ function badge(pct){
   return `<span class="badge b-low">${pct}%</span>`;
 }
 function renderDoc(key){
-  const docs=DOCS[key];
+  const liveMonth = String(REPORT_MONTH_INDEX + 1).padStart(2, '0');
+  const docs = currentDocMonth === liveMonth
+    ? DOCS[key]
+    : ((DOC_ARCHIVE[currentDocMonth] || {})[key] || []);
+  if (!docs.length) {
+    document.getElementById('doc-table').innerHTML = '<div style="padding:24px;color:#9ca3af;text-align:center;">本月資料尚未產生</div>';
+    return;
+  }
   const maxRev=Math.max(...docs.filter(d=>d.n!=='其他未歸屬').map(d=>d.rev));
   let h=`<table><thead><tr>
     <th>醫師</th><th>累計營收</th><th>患者人數</th><th>新客</th><th>舊客</th><th>每人次營收</th>
@@ -686,13 +731,26 @@ function renderDoc(key){
   document.getElementById('doc-table').innerHTML=h;
 }
 let currentDocClinic = 'tp';
+let currentDocMonth = '08';
 function switchDoc(btn,key){
   currentDocClinic = key;
-  document.querySelectorAll('.dtab').forEach(b=>b.classList.remove('active'));
+  btn.closest('.dtab-row').querySelectorAll('.dtab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   renderDoc(key);
 }
-renderDoc('tp');
+function switchDocMonth(btn, month){
+  currentDocMonth = month;
+  btn.closest('.dtab-row').querySelectorAll('.doc-month-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderDoc(currentDocClinic);
+}
+function syncDoctorMonthTabs(){
+  const liveMonth = String(REPORT_MONTH_INDEX + 1).padStart(2, '0');
+  currentDocMonth = liveMonth;
+  document.querySelectorAll('.doc-month-tab').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.month === liveMonth);
+  });
+}
 
 /* ─────────────────────────────────────────
    1–7月業績達成回顧
@@ -865,6 +923,8 @@ async function init({ forceNetwork = false } = {}) {
 
     REPORT_MONTH_INDEX = getReportingMonthIndex(json);
     updateReportingMonthLabels(REPORT_MONTH_INDEX);
+    syncDoctorMonthTabs();
+    syncSAMonthTabs();
 
     // ── Step 1：診次歷史 → 動態更新 MR.labels / MR.sessions / WD ──
     // 每月底自動歸檔後，歷史月份列表會自動延長，不用手動改 HTML
@@ -879,6 +939,12 @@ async function init({ forceNetwork = false } = {}) {
       WD.tp            = months.map(m => hist[m].tp ? hist[m].tp.workdays   : 0);
       WD.hc            = months.map(m => hist[m].hc ? hist[m].hc.workdays   : 0);
       WD.kh            = months.map(m => hist[m].kh ? hist[m].kh.workdays   : 0);
+    }
+    // 進入 9 月後，把 8 月最終診次／工作天正式併入歷史月份。
+    if (REPORT_MONTH_INDEX >= 8 && !MR.labels.includes('8月')) {
+      MR.labels.push('8月');
+      MR.sessions.tp.push(152); MR.sessions.hc.push(77); MR.sessions.kh.push(96); MR.sessions.tc.push(0);
+      WD.tp.push(26); WD.hc.push(26); WD.kh.push(25);
     }
 
     // ── Step 2：業績快照 → MR.actual（歷史月）+ AUG_ACT（當月）──
@@ -1520,8 +1586,9 @@ function renderAnalysis(){
   const augRps  = k => AUG_ACT[k] / AUG_SES[k];
   const rpsPct  = k => pct1(augRps(k)/avgRps(k) - 1);
 
-  // 7月達成率（前一月對比）
-  const prevPct = k => pct1(A[k][6] / (T[k][6]*10000));
+  // 上一個完整月份達成率
+  const previousMonthIndex = Math.max(0, REPORT_MONTH_INDEX - 1);
+  const prevPct = k => pct1(A[k][A[k].length - 1] / (T[k][previousMonthIndex]*10000));
 
   // 預估全月（線性推估：每診均收 × 全月排班診次，與進度卡片一致）
   const projAmt   = k => Math.round(AUG_ACT[k]/AUG_SES[k]*AUG_TSES[k]/10000);
@@ -1565,8 +1632,9 @@ function renderAnalysis(){
     const p=dlyPct(k);
     if(Math.abs(p)>=10){
       const t=p>=30?'極大幅':p>=15?'大幅':p>0?'':'';
-      if(p>0) good.push(`${nm[k]} 日均 ${bold(r1(augDly(k))+'萬')}，較 1–7月均值${t}成長 ${tag('+'+p+'%','up')}`);
-      else    warn.push(`${nm[k]} 日均 ${bold(r1(augDly(k))+'萬')}，較 1–7月均值下滑 ${tag(p+'%','down')}`);
+      const historyRange = `1–${MR.labels.length}月`;
+      if(p>0) good.push(`${nm[k]} 日均 ${bold(r1(augDly(k))+'萬')}，較 ${historyRange}均值${t}成長 ${tag('+'+p+'%','up')}`);
+      else    warn.push(`${nm[k]} 日均 ${bold(r1(augDly(k))+'萬')}，較 ${historyRange}均值下滑 ${tag(p+'%','down')}`);
     }
   });
 
@@ -1579,11 +1647,11 @@ function renderAnalysis(){
     }
   });
 
-  // 7月達成率參考
+  // 上一個完整月份達成率參考
   KEYS.forEach(k=>{
     const p=prevPct(k);
     if(p<90){
-      info.push(`${nm[k]} 上月（7月）達成率 ${bold(p+'%')}，本月目標壓力延續`);
+      info.push(`${nm[k]} 上月（${previousMonthIndex + 1}月）達成率 ${bold(p+'%')}，本月目標壓力延續`);
     }
   });
 
@@ -1856,7 +1924,7 @@ const CLINIC_DAYS_FULL = 26;
 const MONTH_LABELS = {
   '01':'2026年1月','02':'2026年2月','03':'2026年3月','04':'2026年4月',
   '05':'2026年5月','06':'2026年6月','07':'2026年7月',
-  '08':'2026年8月（即時）'
+  '08':'2026年8月（完整月）', '09':'2026年9月（即時）'
 };
 
 let currentSAMonth  = '08';
@@ -1866,8 +1934,10 @@ function fmtDays(n){
 }
 
 function renderSA(){
-  const isCurrent = currentSAMonth === '08';
-  const note = isCurrent
+  const liveMonth = String(REPORT_MONTH_INDEX + 1).padStart(2, '0');
+  const isCurrent = currentSAMonth === liveMonth;
+  const isAugustArchive = currentSAMonth === '08' && !isCurrent;
+  const note = isCurrent || isAugustArchive
     ? '（actual_cashflow；含明確醫師歸屬的營收）'
     : '（HIS 診療；不含 POS，較試算表低 ~15–20%）';
   const monthLabel = isCurrent
@@ -1876,7 +1946,11 @@ function renderSA(){
   document.getElementById('sa-subtitle').textContent = monthLabel + ' ' + note;
   const clinicNames = {tp:'台北初日', hc:'新竹初日', kh:'高雄初日'};
   const sections = ['tp','hc','kh'].map(clinicKey => {
-    const data = isCurrent ? SA[clinicKey] : ((HIST_DATA[currentSAMonth]||{})[clinicKey]||[]);
+    const data = isCurrent
+      ? SA[clinicKey]
+      : isAugustArchive
+        ? ((DOC_ARCHIVE['08'] || {})[clinicKey] || []).filter(d => d.n !== '其他未歸屬')
+        : ((HIST_DATA[currentSAMonth]||{})[clinicKey]||[]);
     if(!data.length) return '';
 
     const totalRev = data.reduce((s,d)=>s+d.rev, 0);
@@ -1925,6 +1999,14 @@ function switchMonth(btn, month){
   btn.classList.add('active');
   currentSAMonth = month;
   renderSA();
+}
+
+function syncSAMonthTabs(){
+  const liveMonth = String(REPORT_MONTH_INDEX + 1).padStart(2, '0');
+  currentSAMonth = liveMonth;
+  document.querySelectorAll('.month-tab').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.month === liveMonth);
+  });
 }
 
 renderSA();
