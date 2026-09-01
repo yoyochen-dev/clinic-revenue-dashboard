@@ -737,6 +737,7 @@ let WD = {
    預設值 = 最近一次已知數字（fetch 失敗時仍可顯示）
 ───────────────────────────────────────── */
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx4_tZukK_poowvvBCYoV1wygn-wStEVOHTel7oyC3w1_g3ZPcLKHWtGmzM_T8nw50/exec';
+const DASHBOARD_DATA_URLS = ['./dashboard-data.json', APPS_SCRIPT_URL];
 
 let AUG_WD     = { tp:15,  hc:15,  kh:15,  tc:0 }; // 已過工作天（截至 2026/08/18）
 let AUG_SES    = { tp:90,  hc:43,  kh:56,  tc:0 }; // 已過診次（截至 2026/08/18）
@@ -797,31 +798,31 @@ function isValidDashboardData(data) {
 
 async function fetchDashboardJson() {
   let lastError;
-  for (let attempt = 0; attempt < 3; attempt++) {
-    try {
-      if (attempt > 0) {
-        await new Promise(resolve => setTimeout(resolve, attempt * 900));
-      }
-      const separator = APPS_SCRIPT_URL.includes('?') ? '&' : '?';
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 7000);
-      let res;
+  for (const sourceUrl of DASHBOARD_DATA_URLS) {
+    for (let attempt = 0; attempt < 2; attempt++) {
       try {
-        res = await fetch(`${APPS_SCRIPT_URL}${separator}_=${Date.now()}`, {
-          cache: 'no-store',
-          signal: controller.signal,
-        });
-      } finally {
-        clearTimeout(timeoutId);
+        if (attempt > 0) await new Promise(resolve => setTimeout(resolve, 600));
+        const separator = sourceUrl.includes('?') ? '&' : '?';
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
+        let res;
+        try {
+          res = await fetch(`${sourceUrl}${separator}_=${Date.now()}`, {
+            cache: 'no-store',
+            signal: controller.signal,
+          });
+        } finally {
+          clearTimeout(timeoutId);
+        }
+        if (!res.ok) throw new Error(`資料來源 HTTP ${res.status}`);
+        const text = await res.text();
+        if (!text.trim().startsWith('{')) throw new Error('資料來源暫時回傳非 JSON 內容');
+        const data = JSON.parse(text);
+        if (!isValidDashboardData(data)) throw new Error('資料來源內容不完整');
+        return data;
+      } catch (error) {
+        lastError = error;
       }
-      if (!res.ok) throw new Error(`API HTTP ${res.status}`);
-      const text = await res.text();
-      if (!text.trim().startsWith('{')) throw new Error('API 暫時回傳非 JSON 內容');
-      const data = JSON.parse(text);
-      if (!isValidDashboardData(data)) throw new Error('API 資料不完整');
-      return data;
-    } catch (error) {
-      lastError = error;
     }
   }
   throw lastError || new Error('API 載入失敗');
