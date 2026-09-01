@@ -443,7 +443,7 @@
   <div class="doctor-card">
     <div class="collapse-header" onclick="toggleCollapse('doc-body')">
       <div>
-        <div class="chart-title" style="margin-bottom:2px;">醫師績效：月累計營收 × 患者人數 × 排班進度</div>
+        <div class="chart-title" style="margin-bottom:2px;">醫師績效：月累計營收 × 新舊客人數 × 排班進度</div>
         <div class="chart-sub" style="margin-bottom:0;"><span data-report-month>8</span>月累計 · 排班進度統計至昨日（營收：每日 JSON；排班：診次儀表板）
           <span class="collapse-hint" id="doc-hint">（點擊展開）</span>
         </div>
@@ -659,7 +659,7 @@ function renderDoc(key){
   const docs=DOCS[key];
   const maxRev=Math.max(...docs.filter(d=>d.n!=='其他未歸屬').map(d=>d.rev));
   let h=`<table><thead><tr>
-    <th>醫師</th><th>累計營收</th><th>患者人數</th><th>每人次營收</th>
+    <th>醫師</th><th>累計營收</th><th>患者人數</th><th>新客</th><th>舊客</th><th>每人次營收</th>
     <th>排班進度</th>
   </tr></thead><tbody>`;
   docs.forEach(d=>{
@@ -676,6 +676,8 @@ function renderDoc(key){
         </div>
       </td>
       <td>${d.enc!==null?d.enc+' 人':'—'}</td>
+      <td>${d.newPatients!=null?d.newPatients+' 人':'—'}</td>
+      <td>${d.returning!=null?d.returning+' 人':'—'}</td>
       <td>${rpe}</td>
       <td>${badge(pct)}${d.st!=null?`<span class="sch-num">${d.sd}/${d.st}</span>`:''}</td>
     </tr>`;
@@ -914,6 +916,9 @@ async function init({ forceNetwork = false } = {}) {
     // ── Step 2.6：醫師當月營收 → 更新兩個 8 月醫師分析版位 ──
     if (json.doctorRevenue) {
       syncDoctorRevenueData(json.doctorRevenue);
+    }
+    if (json.doctorPatients) {
+      syncDoctorPatientData(json.doctorPatients);
     }
 
     // ── Step 3：診次快照 → 當月 AUG_SES / AUG_WD ──
@@ -1683,6 +1688,26 @@ function syncDoctorRevenueData(doctorRevenue) {
       };
     });
     SA[key].splice(0, SA[key].length, ...nextSA);
+  });
+}
+
+function syncDoctorPatientData(doctorPatients) {
+  ['tp', 'hc', 'kh', 'tc'].forEach(key => {
+    const rows = Array.isArray(doctorPatients[key]) ? doctorPatients[key] : [];
+    if (!rows.length || !Array.isArray(DOCS[key])) return;
+    const patientMap = new Map(rows.map(row => [row.name, row]));
+    DOCS[key].forEach(doctor => {
+      if (doctor.n === '其他未歸屬') return;
+      const patient = patientMap.get(doctor.n);
+      if (!patient) {
+        doctor.newPatients = null;
+        doctor.returning = null;
+        return;
+      }
+      doctor.newPatients = Number(patient.newPatients) || 0;
+      doctor.returning = Number(patient.returning) || 0;
+      doctor.enc = doctor.newPatients + doctor.returning;
+    });
   });
 }
 
