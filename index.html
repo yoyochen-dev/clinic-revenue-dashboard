@@ -123,6 +123,9 @@
     .b-gray  { background: #f3f4f6; color: #6b7280; }
     .b-low   { background: #fee2e2; color: #991b1b; }
     .sch-num { font-size: 11px; color: #9ca3af; margin-left: 4px; }
+    .doc-total-row td { background:#f0f7f3; border-top:2px solid #cfe3d7; font-weight:700; }
+    .doc-total-row:hover td { background:#e8f3ed; }
+    .doc-total-row .returning-people-note { font-weight:500; }
     .footnote { font-size: 11px; color: #9ca3af; margin-top: 16px; padding-top: 12px; border-top: 1px solid #f3f4f6; line-height: 1.8; }
 
     @media(max-width:760px){
@@ -747,6 +750,27 @@ function renderDoc(key){
       <td>${badge(pct)}${d.st!=null?`<span class="sch-num">${d.sd}/${d.st}</span>`:''}</td>
     </tr>`;
   });
+  const totalRevenue=docs.reduce((sum,d)=>sum+(Number(d.rev)||0),0);
+  const totalPatients=docs.reduce((sum,d)=>sum+(d.enc!=null?Number(d.enc)||0:0),0);
+  const totalNew=docs.reduce((sum,d)=>sum+(d.newPatients!=null?Number(d.newPatients)||0:0),0);
+  const totalReturningVisits=docs.reduce((sum,d)=>{
+    const visits=d.returningVisits ?? d.returning;
+    return sum+(visits!=null?Number(visits)||0:0);
+  },0);
+  const totalReturningPeople=docs.reduce((sum,d)=>sum+(d.returning!=null?Number(d.returning)||0:0),0);
+  const totalElapsed=docs.reduce((sum,d)=>sum+(d.sd!=null?Number(d.sd)||0:0),0);
+  const totalScheduled=docs.reduce((sum,d)=>sum+(d.st!=null?Number(d.st)||0:0),0);
+  const totalRpe=totalPatients>0?fmt(Math.round(totalRevenue/totalPatients))+'元':'—';
+  const totalPct=totalScheduled>0?Math.round(totalElapsed/totalScheduled*100):null;
+  h+=`<tr class="doc-total-row">
+    <td class="doc-name">合計</td>
+    <td>${fmtW(totalRevenue)}</td>
+    <td>${totalPatients||'—'}</td>
+    <td>${totalNew||'—'}</td>
+    <td>${totalReturningVisits||'—'}${totalReturningPeople?`<span class="returning-people-note">${totalReturningPeople}</span>`:''}</td>
+    <td>${totalRpe}</td>
+    <td>${badge(totalPct)}${totalScheduled?`<span class="sch-num">${totalElapsed}/${totalScheduled}</span>`:''}</td>
+  </tr>`;
   h+='</tbody></table>';
   document.getElementById('doc-table').innerHTML=h;
 }
