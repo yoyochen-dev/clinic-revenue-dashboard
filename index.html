@@ -738,10 +738,10 @@ function renderDoc(key){
           <span>${fmtW(d.rev)}</span>
         </div>
       </td>
-      <td>${d.enc!==null?d.enc+' 人次':'—'}</td>
-      <td>${d.newPatients!=null?d.newPatients+' 人':'—'}</td>
+      <td>${d.enc!==null?d.enc:'—'}</td>
+      <td>${d.newPatients!=null?d.newPatients:'—'}</td>
       <td>${returningVisits!=null
-        ? `${returningVisits} 人次${d.returning!=null?`<span class="returning-people-note">${d.returning} 人</span>`:''}`
+        ? `${returningVisits}${d.returning!=null?`<span class="returning-people-note">${d.returning}</span>`:''}`
         : '—'}</td>
       <td>${rpe}</td>
       <td>${badge(pct)}${d.st!=null?`<span class="sch-num">${d.sd}/${d.st}</span>`:''}</td>
