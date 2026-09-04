@@ -51,9 +51,14 @@
     .cc-tp .cc-revenue { color: #2D6A4F; }
     .cc-hc .cc-revenue { color: #40916C; }
     .cc-kh .cc-revenue { color: #52B788; }
-    .cc-metrics { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 14px; }
+    .cc-metrics { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 12px; }
     .cc-m-label { font-size: 10px; color: #9ca3af; margin-bottom: 3px; }
     .cc-m-value { font-size: 15px; font-weight: 600; color: #374151; }
+    .cc-secondary { display:flex; gap:18px; padding-top:10px; margin-bottom:12px; border-top:1px solid #f3f4f6; }
+    .cc-secondary > div { min-width:0; }
+    .metric-definition { display:flex; gap:18px; align-items:flex-start; background:#f8faf9; border:1px solid #e5ebe7; border-radius:10px; padding:10px 14px; margin:-4px 0 18px; color:#647067; font-size:11px; line-height:1.55; }
+    .metric-definition strong { color:#315746; }
+    .returning-people-note { display:block; margin-top:2px; color:#9ca3af; font-size:10px; line-height:1.3; }
     .cc-pt-split { display: flex; gap: 6px; margin-top: 3px; flex-wrap: wrap; }
     .cc-pt-tag { font-size: 10px; padding: 1px 6px; border-radius: 8px; font-weight: 600; white-space: nowrap; }
     .cc-pt-new  { background: #dbeafe; color: #1d4ed8; }
@@ -119,6 +124,11 @@
     .b-low   { background: #fee2e2; color: #991b1b; }
     .sch-num { font-size: 11px; color: #9ca3af; margin-left: 4px; }
     .footnote { font-size: 11px; color: #9ca3af; margin-top: 16px; padding-top: 12px; border-top: 1px solid #f3f4f6; line-height: 1.8; }
+
+    @media(max-width:760px){
+      .cc-metrics { grid-template-columns:repeat(2,1fr); }
+      .metric-definition { flex-direction:column; gap:4px; }
+    }
 
     /* ── 業績分析小結 ── */
     .analysis-card { background:white; border-radius:12px; padding:20px; margin-bottom:18px; }
@@ -285,14 +295,12 @@
       </div>
       <div class="cc-revenue" id="cc-rev-tp">—<span style="font-size:14px;">萬</span></div>
       <div class="cc-metrics">
-        <div>
-          <div class="cc-m-label">患者人數</div>
-          <div class="cc-m-value" id="cc-patient-tp">— 人</div>
-          <div class="cc-pt-split">
-            <span class="cc-pt-tag cc-pt-new" id="cc-new-tp">初診 —</span>
-            <span class="cc-pt-tag cc-pt-ret" id="cc-returning-tp">回診 —</span>
-          </div>
-        </div>
+        <div><div class="cc-m-label">患者人次</div><div class="cc-m-value" id="cc-patient-tp">— 人次</div></div>
+        <div><div class="cc-m-label">新客數</div><div class="cc-m-value" id="cc-new-tp">— 人</div></div>
+        <div><div class="cc-m-label">舊客人次</div><div class="cc-m-value" id="cc-returning-visits-tp">— 人次</div></div>
+        <div><div class="cc-m-label">舊客人數</div><div class="cc-m-value" id="cc-returning-tp">— 人</div></div>
+      </div>
+      <div class="cc-secondary">
         <div><div class="cc-m-label">每人次營收</div><div class="cc-m-value" id="cc-rpp-tp">—元</div></div>
         <div><div class="cc-m-label">排班診次</div><div class="cc-m-value" id="cc-session-tp">78/152</div></div>
       </div>
@@ -309,14 +317,12 @@
       </div>
       <div class="cc-revenue" id="cc-rev-hc">—<span style="font-size:14px;">萬</span></div>
       <div class="cc-metrics">
-        <div>
-          <div class="cc-m-label">患者人數</div>
-          <div class="cc-m-value" id="cc-patient-hc">— 人</div>
-          <div class="cc-pt-split">
-            <span class="cc-pt-tag cc-pt-new" id="cc-new-hc">初診 —</span>
-            <span class="cc-pt-tag cc-pt-ret" id="cc-returning-hc">回診 —</span>
-          </div>
-        </div>
+        <div><div class="cc-m-label">患者人次</div><div class="cc-m-value" id="cc-patient-hc">— 人次</div></div>
+        <div><div class="cc-m-label">新客數</div><div class="cc-m-value" id="cc-new-hc">— 人</div></div>
+        <div><div class="cc-m-label">舊客人次</div><div class="cc-m-value" id="cc-returning-visits-hc">— 人次</div></div>
+        <div><div class="cc-m-label">舊客人數</div><div class="cc-m-value" id="cc-returning-hc">— 人</div></div>
+      </div>
+      <div class="cc-secondary">
         <div><div class="cc-m-label">每人次營收</div><div class="cc-m-value" id="cc-rpp-hc">—元</div></div>
         <div><div class="cc-m-label">排班診次</div><div class="cc-m-value" id="cc-session-hc">39/77</div></div>
       </div>
@@ -333,20 +339,23 @@
       </div>
       <div class="cc-revenue" id="cc-rev-kh">—<span style="font-size:14px;">萬</span></div>
       <div class="cc-metrics">
-        <div>
-          <div class="cc-m-label">患者人數</div>
-          <div class="cc-m-value" id="cc-patient-kh">— 人</div>
-          <div class="cc-pt-split">
-            <span class="cc-pt-tag cc-pt-new" id="cc-new-kh">初診 —</span>
-            <span class="cc-pt-tag cc-pt-ret" id="cc-returning-kh">回診 —</span>
-          </div>
-        </div>
+        <div><div class="cc-m-label">患者人次</div><div class="cc-m-value" id="cc-patient-kh">— 人次</div></div>
+        <div><div class="cc-m-label">新客數</div><div class="cc-m-value" id="cc-new-kh">— 人</div></div>
+        <div><div class="cc-m-label">舊客人次</div><div class="cc-m-value" id="cc-returning-visits-kh">— 人次</div></div>
+        <div><div class="cc-m-label">舊客人數</div><div class="cc-m-value" id="cc-returning-kh">— 人</div></div>
+      </div>
+      <div class="cc-secondary">
         <div><div class="cc-m-label">每人次營收</div><div class="cc-m-value" id="cc-rpp-kh">—元</div></div>
         <div><div class="cc-m-label">排班診次</div><div class="cc-m-value" id="cc-session-kh">48/100</div></div>
       </div>
       <div class="prog-header"><span>排班進度</span><span id="cc-progress-label-kh">48% · 診次快照</span></div>
       <div class="prog-bar"><div class="prog-fill" id="cc-progress-fill-kh" style="width:48%"></div></div>
     </div>
+  </div>
+
+  <div class="metric-definition">
+    <span><strong>舊客人次（回診人次）</strong>：反映醫師工作量，也就是實際看了幾次診。</span>
+    <span><strong>舊客人數（不重複回診人數）</strong>：反映醫師病患廣度，也就是服務了多少位舊客。</span>
   </div>
 
   <!-- 8月業績進度 -->
@@ -382,7 +391,7 @@
       <tbody id="aug-table-body"></tbody>
     </table>
     <div class="footnote">
-      ＊ 每診格均收 = 當前業績 ÷ 已過診次（診格）；與每人次營收（患者人數）定義不同，請勿混用<br>
+      ＊ 每診格均收 = 當前業績 ÷ 已過診次（診格）；與每人次營收（患者人次）定義不同，請勿混用<br>
       ＊ 預估全月業績 = 每診格均收 × 全月排班診次（線性推估，實際可能因剩餘診次組合而有所不同）<br>
       ＊ 今日應達目標採診次比例法：月目標 × 已過診次 ÷ 全月排班診次；診次來源：Apps Script 診次儀表板（統計至 <span data-session-cutoff>2026/08/15</span>）
     </div>
@@ -421,7 +430,7 @@
   <!-- Charts（移至業績總覽後） -->
   <div class="chart-row">
     <div class="chart-card">
-      <div class="chart-title">每日營收 × 患者人數</div>
+      <div class="chart-title">每日營收 × 患者人次</div>
       <div class="chart-sub">柱狀圖 = 當日淨營收（元）· 折線 = 患者來診人次（右軸）</div>
       <div class="tab-row">
         <button class="tab-btn active" onclick="switchTrend(this,'all')">三院合計</button>
@@ -433,7 +442,7 @@
     </div>
     <div class="chart-card">
       <div class="chart-title">每診次平均營收（客單價趨勢）</div>
-      <div class="chart-sub">當日營收 ÷ 當日患者人數・僅計有診次日</div>
+      <div class="chart-sub">當日營收 ÷ 當日患者人次・僅計有診次日</div>
       <div style="height:42px;"></div>
       <div class="chart-wrap"><canvas id="rpeChart"></canvas></div>
     </div>
@@ -443,7 +452,7 @@
   <div class="doctor-card">
     <div class="collapse-header" onclick="toggleCollapse('doc-body')">
       <div>
-        <div class="chart-title" style="margin-bottom:2px;">醫師績效：月累計營收 × 新舊客人數 × 排班進度</div>
+        <div class="chart-title" style="margin-bottom:2px;">醫師績效：月累計營收 × 新舊客人次 × 排班進度</div>
         <div class="chart-sub" style="margin-bottom:0;"><span data-report-month>8</span>月累計 · 排班進度統計至昨日（營收：每日 JSON；排班：診次儀表板）
           <span class="collapse-hint" id="doc-hint">（點擊展開）</span>
         </div>
@@ -462,7 +471,8 @@
       </div>
       <div id="doc-table"></div>
       <div class="footnote">
-        ＊ 患者人數：<code>cofit_bi_prod.int.int_clinic_encounters</code>（state=2 已完成）<br>
+        ＊ 患者人次：新客數＋舊客人次；<code>cofit_bi_prod.int.int_clinic_encounters</code>（state=2 已完成）<br>
+        ＊ 舊客人次反映工作量；舊客人數為不重複回診人數，反映病患廣度<br>
         ＊ 醫師營收：<code>cofit_bi_prod.core.fct_clinic_pos_order_details</code>（actual_cashflow，report_month=2026-08）<br>
         ＊ 排班診次進度：來源為「初日診所｜已過診次儀表板」Apps Script（統計至 <span data-session-cutoff>2026/08/15</span>）<br>
         ＊ SimplyBook（stg_simplybook_schedule_snapshots）的 monthly_booked 為病患預約量，與診次格數定義不同，不宜直接套用<br>
@@ -501,7 +511,7 @@
         ＊ 上班天數(當前) = 已過診次 ÷ 2；整數 = 整天、0.5 = 半天（僅早或晚單診格）<br>
         ＊ 當月總上班天數 = 全月排班診次 ÷ 2（預計整月班表）<br>
         ＊ 總和／平均列：上班天數欄位為診所整體開診天數；平均日營收 = 各醫師合計營收 ÷ 各醫師合計上班天數（加權）<br>
-        ＊ 平均單診標紅代表低於院所當前加權平均，供督導參考；診次組合（科別、療程）不同，請交叉比對患者人數<br>
+        ＊ 平均單診標紅代表低於院所當前加權平均，供督導參考；診次組合（科別、療程）不同，請交叉比對患者人次<br>
         ＊ 本表「總和」僅統計有明確歸屬醫師的部分；「其他未歸屬」不列入醫師平均計算
       </div>
     </div>
@@ -603,7 +613,7 @@ let tChart = new Chart(document.getElementById('trendChart'),{
       {type:'bar',label:'當日營收',data:allRev,
        backgroundColor:allRev.map(r=>r>=3000000?'rgba(27,67,50,.9)':'rgba(45,106,79,.75)'),
        borderRadius:4,yAxisID:'y',order:2},
-      {type:'line',label:'患者人數',data:allVis,
+      {type:'line',label:'患者人次',data:allVis,
        borderColor:'#1B4332',backgroundColor:'transparent',
        pointBackgroundColor:'#1B4332',pointRadius:4,tension:.3,yAxisID:'y2',order:1}
     ]
@@ -704,12 +714,13 @@ function renderDoc(key){
   }
   const maxRev=Math.max(...docs.filter(d=>d.n!=='其他未歸屬').map(d=>d.rev));
   let h=`<table><thead><tr>
-    <th>醫師</th><th>累計營收</th><th>患者人數</th><th>新客</th><th>舊客</th><th>每人次營收</th>
+    <th>醫師</th><th>累計營收</th><th>患者人次</th><th>新客數</th><th>舊客人次<br><span style="font-size:9px;font-weight:400;">舊客人數</span></th><th>每人次營收</th>
     <th>排班進度</th>
   </tr></thead><tbody>`;
   docs.forEach(d=>{
     const isOther=d.n==='其他未歸屬';
     const rpe=d.enc?fmt(Math.round(d.rev/d.enc))+'元':'—';
+    const returningVisits=d.returningVisits ?? d.returning;
     const pct=d.st!=null?Math.round(d.sd/d.st*100):null;
     const barPct=isOther?0:Math.round(d.rev/maxRev*100);
     h+=`<tr style="${isOther?'opacity:.55':''}">
@@ -720,9 +731,11 @@ function renderDoc(key){
           <span>${fmtW(d.rev)}</span>
         </div>
       </td>
-      <td>${d.enc!==null?d.enc+' 人':'—'}</td>
+      <td>${d.enc!==null?d.enc+' 人次':'—'}</td>
       <td>${d.newPatients!=null?d.newPatients+' 人':'—'}</td>
-      <td>${d.returning!=null?d.returning+' 人':'—'}</td>
+      <td>${returningVisits!=null
+        ? `${returningVisits} 人次${d.returning!=null?`<span class="returning-people-note">${d.returning} 人</span>`:''}`
+        : '—'}</td>
       <td>${rpe}</td>
       <td>${badge(pct)}${d.st!=null?`<span class="sch-num">${d.sd}/${d.st}</span>`:''}</td>
     </tr>`;
@@ -805,10 +818,10 @@ let AUG_TSES   = { tp:152, hc:77,  kh:100, tc:0 }; // 全月排班診次
 let AUG_ACT    = { tp:19709192, hc:8963274, kh:8045985, tc:0 }; // 當月實際業績（元）截至 2026/08/18
 let AUG_WD_TOT = { tp:26,  hc:26,  kh:26,  tc:0 }; // 全月工作天
 let AUG_PATIENTS = {
-  tp: { total: 0, newPatients: 0, returning: 0 },
-  hc: { total: 0, newPatients: 0, returning: 0 },
-  kh: { total: 0, newPatients: 0, returning: 0 },
-  tc: { total: 0, newPatients: 0, returning: 0 },
+  tp: { total: 0, newPatients: 0, returningVisits: 0, returning: 0 },
+  hc: { total: 0, newPatients: 0, returningVisits: 0, returning: 0 },
+  kh: { total: 0, newPatients: 0, returningVisits: 0, returning: 0 },
+  tc: { total: 0, newPatients: 0, returningVisits: 0, returning: 0 },
 };
 
 // 當月目標（元）—— 從 MR.targets[當月index] 動態計算，預設 8 月
@@ -966,15 +979,25 @@ async function init({ forceNetwork = false } = {}) {
       AUG_TGT.tc = (MR.targets.tc[now] || 0) * 10000;
     }
 
-    // ── Step 2.5：患者人次 → 當月總人次／初診／回診 ──
+    // ── Step 2.5：患者人次 = 新客數 + 舊客人次；returning 為不重複舊客人數 ──
     if (json.patients) {
       const now = REPORT_MONTH_INDEX;
       ['tp', 'hc', 'kh', 'tc'].forEach(key => {
         const patient = json.patients[key] || {};
+        const newPatients = Number(patient.newPatients?.[now]) || 0;
+        const returning = Number(patient.returning?.[now]) || 0;
+        const doctorRows = Array.isArray(json.doctorPatients?.[key]) ? json.doctorPatients[key] : [];
+        const returningVisitsFromDoctors = doctorRows.reduce(
+          (sum, row) => sum + (Number(row.returningVisits) || 0), 0
+        );
+        const returningVisits = Number(patient.returningVisits?.[now])
+          || returningVisitsFromDoctors
+          || returning;
         AUG_PATIENTS[key] = {
-          total: Number(patient.total?.[now]) || 0,
-          newPatients: Number(patient.newPatients?.[now]) || 0,
-          returning: Number(patient.returning?.[now]) || 0,
+          total: newPatients + returningVisits,
+          newPatients,
+          returningVisits,
+          returning,
         };
       });
     }
@@ -1064,11 +1087,13 @@ async function init({ forceNetwork = false } = {}) {
       const patient = AUG_PATIENTS[key];
       const patientEl = document.getElementById(`cc-patient-${key}`);
       const newEl = document.getElementById(`cc-new-${key}`);
+      const returningVisitsEl = document.getElementById(`cc-returning-visits-${key}`);
       const returningEl = document.getElementById(`cc-returning-${key}`);
       const rppEl = document.getElementById(`cc-rpp-${key}`);
-      if (patientEl) patientEl.textContent = `${fmt(patient.total)} 人`;
-      if (newEl) newEl.textContent = `初診 ${fmt(patient.newPatients)}`;
-      if (returningEl) returningEl.textContent = `回診 ${fmt(patient.returning)}`;
+      if (patientEl) patientEl.textContent = `${fmt(patient.total)} 人次`;
+      if (newEl) newEl.textContent = `${fmt(patient.newPatients)} 人`;
+      if (returningVisitsEl) returningVisitsEl.textContent = `${fmt(patient.returningVisits)} 人次`;
+      if (returningEl) returningEl.textContent = `${fmt(patient.returning)} 人`;
       if (rppEl) {
         const avg = patient.total > 0 ? Math.round(AUG_ACT[key] / patient.total) : 0;
         rppEl.textContent = `${fmt(avg)}元`;
@@ -1770,11 +1795,14 @@ function syncDoctorPatientData(doctorPatients) {
       if (!patient) {
         doctor.newPatients = null;
         doctor.returning = null;
+        doctor.returningVisits = null;
+        doctor.enc = null;
         return;
       }
       doctor.newPatients = Number(patient.newPatients) || 0;
       doctor.returning = Number(patient.returning) || 0;
-      doctor.enc = doctor.newPatients + doctor.returning;
+      doctor.returningVisits = Number(patient.returningVisits) || doctor.returning;
+      doctor.enc = doctor.newPatients + doctor.returningVisits;
     });
   });
 }
