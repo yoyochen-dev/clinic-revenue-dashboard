@@ -8,6 +8,17 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif; background: #EEF0EC; color: #1a1a1a; min-height: 100vh; }
+    body.auth-locked > .header, body.auth-locked > .container { display: none; }
+    .auth-gate { min-height: 100vh; display: grid; place-items: center; padding: 24px; background: #EEF0EC; }
+    body:not(.auth-locked) > .auth-gate { display: none; }
+    .auth-card { width: min(400px, 100%); padding: 32px; border-radius: 16px; background: #fff; box-shadow: 0 14px 40px rgba(27,67,50,.12); }
+    .auth-card h1 { color: #1B4332; font-size: 22px; margin-bottom: 8px; }
+    .auth-card p { color: #6b7280; font-size: 13px; line-height: 1.6; margin-bottom: 22px; }
+    .auth-card label { display: block; margin-bottom: 7px; color: #374151; font-size: 13px; font-weight: 600; }
+    .auth-card input { width: 100%; height: 44px; padding: 0 12px; border: 1px solid #d1d5db; border-radius: 9px; font: inherit; outline: none; }
+    .auth-card input:focus { border-color: #2D6A4F; box-shadow: 0 0 0 3px rgba(45,106,79,.12); }
+    .auth-card button { width: 100%; height: 44px; margin-top: 12px; border: 0; border-radius: 9px; background: #1B4332; color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+    .auth-error { min-height: 20px; margin-top: 9px; color: #b91c1c; font-size: 12px; }
 
     /* Header */
     .header { background: #1B4332; color: white; padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; }
@@ -247,7 +258,44 @@
     .mp-table .c-warn { color: #b45309; font-weight: 600; }
   </style>
 </head>
-<body>
+<body class="auth-locked">
+
+<section class="auth-gate" aria-labelledby="auth-title">
+  <form class="auth-card" id="auth-form">
+    <h1 id="auth-title">初日診所｜業績追蹤儀表板</h1>
+    <p>此頁面僅供內部使用，請輸入密碼後查看。</p>
+    <label for="auth-password">密碼</label>
+    <input id="auth-password" type="password" autocomplete="current-password" required autofocus>
+    <button type="submit">進入儀表板</button>
+    <div class="auth-error" id="auth-error" role="alert"></div>
+  </form>
+</section>
+
+<script>
+  (() => {
+    const ACCESS_KEY = 'clinic-dashboard-access-v1';
+    const PASSWORD_HASH = 'adc44c23914c67a80d9854a9eb2cb2b260817c1e45f0bdb4449c955a9c493c90';
+    const unlock = () => document.body.classList.remove('auth-locked');
+    if (localStorage.getItem(ACCESS_KEY) === PASSWORD_HASH) unlock();
+
+    document.getElementById('auth-form').addEventListener('submit', async event => {
+      event.preventDefault();
+      const input = document.getElementById('auth-password');
+      const bytes = new TextEncoder().encode(input.value);
+      const digest = await crypto.subtle.digest('SHA-256', bytes);
+      const hash = [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, '0')).join('');
+      if (hash === PASSWORD_HASH) {
+        localStorage.setItem(ACCESS_KEY, PASSWORD_HASH);
+        input.value = '';
+        document.getElementById('auth-error').textContent = '';
+        unlock();
+      } else {
+        document.getElementById('auth-error').textContent = '密碼不正確，請重新輸入。';
+        input.select();
+      }
+    });
+  })();
+</script>
 
 <div class="header">
   <div>
