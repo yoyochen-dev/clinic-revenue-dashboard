@@ -1032,12 +1032,31 @@ async function init({ forceNetwork = false } = {}) {
       WD.hc            = months.map(m => hist[m].hc ? hist[m].hc.workdays   : 0);
       WD.kh            = months.map(m => hist[m].kh ? hist[m].kh.workdays   : 0);
     }
-    // 進入 9 月後，把 8 月最終診次／工作天正式併入歷史月份。
-    if (REPORT_MONTH_INDEX >= 8 && !MR.labels.includes('8月')) {
-      MR.labels.push('8月');
-      MR.sessions.tp.push(152); MR.sessions.hc.push(77); MR.sessions.kh.push(96); MR.sessions.tc.push(0);
-      WD.tp.push(26); WD.hc.push(26); WD.kh.push(25);
-    }
+    // 當 Apps Script 的 histSessions 尚未歸檔最近完整月份時，使用月底成功快照補齊。
+    // 只會加入當月之前的月份，不會把進行中月份誤當歷史資料。
+    const finalizedMonths = {
+      8: {
+        sessions: { tp:152, hc:77, kh:96, tc:0 },
+        workdays: { tp:26, hc:26, kh:25 }
+      },
+      9: {
+        sessions: { tp:143, hc:75, kh:93, tc:17 },
+        workdays: { tp:24, hc:24, kh:24 }
+      }
+    };
+    Object.entries(finalizedMonths).forEach(([monthText, snapshot]) => {
+      const month = Number(monthText);
+      if (month <= REPORT_MONTH_INDEX && !MR.labels.includes(`${month}月`)) {
+        MR.labels.push(`${month}月`);
+        MR.sessions.tp.push(snapshot.sessions.tp);
+        MR.sessions.hc.push(snapshot.sessions.hc);
+        MR.sessions.kh.push(snapshot.sessions.kh);
+        MR.sessions.tc.push(snapshot.sessions.tc);
+        WD.tp.push(snapshot.workdays.tp);
+        WD.hc.push(snapshot.workdays.hc);
+        WD.kh.push(snapshot.workdays.kh);
+      }
+    });
 
     // ── Step 2：業績快照 → MR.actual（歷史月）+ AUG_ACT（當月）──
     if (json.revenue) {
