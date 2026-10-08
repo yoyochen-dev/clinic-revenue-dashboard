@@ -45,11 +45,12 @@
     .kpi.dark .kpi-note { color: rgba(255,255,255,.45); }
 
     /* Clinic Cards */
-    .clinic-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 18px; }
+    .clinic-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 18px; }
     .clinic-card { background: white; border-radius: 12px; padding: 20px; border-top: 4px solid; }
     .cc-tp { border-color: #2D6A4F; }
     .cc-hc { border-color: #52B788; }
     .cc-kh { border-color: #95D5B2; }
+    .cc-tc { border-color: #60A5FA; }
     .cc-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .cc-name { font-size: 13px; font-weight: 600; color: #6b7280; }
     .cc-pct-wrap { text-align: right; }
@@ -58,10 +59,12 @@
     .cc-tp .cc-pct { color: #2D6A4F; }
     .cc-hc .cc-pct { color: #40916C; }
     .cc-kh .cc-pct { color: #52B788; }
+    .cc-tc .cc-pct { color: #2563EB; }
     .cc-revenue { font-size: 28px; font-weight: 700; letter-spacing: -.5px; margin-bottom: 14px; }
     .cc-tp .cc-revenue { color: #2D6A4F; }
     .cc-hc .cc-revenue { color: #40916C; }
     .cc-kh .cc-revenue { color: #52B788; }
+    .cc-tc .cc-revenue { color: #2563EB; }
     .cc-metrics { display: grid; grid-template-columns: 1.45fr 1fr 1fr; gap: 10px; margin-bottom: 14px; }
     .cc-m-label { font-size: 10px; color: #9ca3af; margin-bottom: 3px; }
     .cc-patient-label { color:#374151; font-weight:700; }
@@ -80,6 +83,7 @@
     .cc-tp .prog-fill { background: #2D6A4F; }
     .cc-hc .prog-fill { background: #52B788; }
     .cc-kh .prog-fill { background: #95D5B2; }
+    .cc-tc .prog-fill { background: #60A5FA; }
 
     /* Charts */
     .chart-row { display: grid; grid-template-columns: 3fr 2fr; gap: 14px; margin-bottom: 18px; }
@@ -100,6 +104,7 @@
     .sa-matrix-title.tp { background:#e4f1eb; }
     .sa-matrix-title.hc { background:#edf7df; }
     .sa-matrix-title.kh { background:#e3efff; }
+    .sa-matrix-title.tc { background:#e0f2fe; }
     .sa-matrix { min-width:760px; margin:0; }
     .sa-matrix th, .sa-matrix td { white-space:nowrap; text-align:right; }
     .sa-matrix th:first-child, .sa-matrix td:first-child { position:sticky; left:0; z-index:1; text-align:left; background:#fff; box-shadow:1px 0 #e5e7eb; }
@@ -139,7 +144,11 @@
     .doc-total-row .returning-people-note { font-weight:500; }
     .footnote { font-size: 11px; color: #9ca3af; margin-top: 16px; padding-top: 12px; border-top: 1px solid #f3f4f6; line-height: 1.8; }
 
+    @media(max-width:1100px){
+      .clinic-row, .mp-clinic-row { grid-template-columns:repeat(2,1fr); }
+    }
     @media(max-width:760px){
+      .clinic-row, .mp-clinic-row { grid-template-columns:1fr; }
       .cc-metrics { grid-template-columns:1fr 1fr; }
       .cc-metrics > div:first-child { grid-column:1 / -1; }
       .metric-definition { flex-direction:column; gap:4px; }
@@ -212,11 +221,12 @@
     .mp-section-title { font-size: 14px; font-weight: 600; }
     .mp-section-badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; background: #d1fae5; color: #065f46; }
     .mp-section-badge.warn { background: #fee2e2; color: #991b1b; }
-    .mp-clinic-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin: 16px 0 20px; }
+    .mp-clinic-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin: 16px 0 20px; }
     .mp-clinic { border-radius: 10px; padding: 16px; background: #f9fafb; border-left: 4px solid; }
     .mp-tp { border-color: #2D6A4F; }
     .mp-hc { border-color: #40916C; }
     .mp-kh { border-color: #52B788; }
+    .mp-tc { border-color: #2563EB; }
     .mp-clinic-name { font-size: 13px; font-weight: 600; color: #6b7280; margin-bottom: 2px; }
     .mp-target-lbl { font-size: 12px; color: #9ca3af; margin-bottom: 8px; }
     .mp-status { font-size: 13px; font-weight: 700; margin-bottom: 12px; padding: 3px 10px; border-radius: 6px; display: inline-block; }
@@ -240,6 +250,7 @@
     .mp-tp-fill { background: #2D6A4F; }
     .mp-hc-fill { background: #40916C; }
     .mp-kh-fill { background: #52B788; }
+    .mp-tc-fill { background: #2563EB; }
     .mp-marker { position: absolute; top: -4px; width: 2px; height: 16px; background: #374151; border-radius: 1px; }
     .mp-marker-lbl { font-size: 9px; color: #374151; position: absolute; top: -16px; transform: translateX(-50%); white-space: nowrap; font-weight: 600; }
     .mp-proj { font-size: 12px; color: #6b7280; margin-top: 6px; }
@@ -300,7 +311,7 @@
 <div class="header">
   <div>
     <h1>初日診所｜業績追蹤儀表板</h1>
-    <p>台北・新竹・高雄｜2026年<span data-report-month>8</span>月</p>
+    <p>台北・新竹・高雄・台中｜2026年<span data-report-month>8</span>月</p>
   </div>
   <div class="header-right">
     <div id="data-status"><span class="live-dot loading"></span>正在取得最新資料…</div>
@@ -313,7 +324,7 @@
   <!-- KPI -->
   <div class="kpi-row">
     <div class="kpi dark">
-      <div class="kpi-label">三院累計淨營收</div>
+      <div class="kpi-label">四院累計淨營收</div>
       <div class="kpi-value" id="kpi-total-val">—<span class="kpi-unit">萬</span></div>
       <div class="kpi-note" id="kpi-total-note">載入中…</div>
       <div class="kpi-note" id="kpi-rev-ts" style="margin-top:4px;font-size:10px;opacity:0.6;">業績快照更新中…</div>
@@ -326,12 +337,12 @@
     <div class="kpi">
       <div class="kpi-label">平均每人次營收</div>
       <div class="kpi-value" id="kpi-revenue-per-patient">—<span class="kpi-unit">元</span></div>
-      <div class="kpi-note">三院加總平均</div>
+      <div class="kpi-note">四院加總平均</div>
     </div>
     <div class="kpi">
       <div class="kpi-label">排班診次進度</div>
       <div class="kpi-value" id="kpi-session-val">165<span class="kpi-unit">/329</span></div>
-      <div class="kpi-note" id="kpi-session-note">三院已過 50%・診次快照</div>
+      <div class="kpi-note" id="kpi-session-note">四院已過 50%・診次快照</div>
     </div>
   </div>
 
@@ -409,6 +420,30 @@
       <div class="prog-header"><span>排班進度</span><span id="cc-progress-label-kh">48% · 診次快照</span></div>
       <div class="prog-bar"><div class="prog-fill" id="cc-progress-fill-kh" style="width:48%"></div></div>
     </div>
+    <div class="clinic-card cc-tc">
+      <div class="cc-head">
+        <span class="cc-name">台中初日</span>
+        <div class="cc-pct-wrap">
+          <div class="cc-pct-lbl">診次進度</div>
+          <span class="cc-pct" id="cc-pct-tc">0%</span>
+        </div>
+      </div>
+      <div class="cc-revenue" id="cc-rev-tc">—<span style="font-size:14px;">萬</span></div>
+      <div class="cc-metrics">
+        <div>
+          <div class="cc-m-label cc-patient-label">患者人次</div>
+          <div class="cc-m-value" id="cc-patient-tc">— 人次</div>
+          <div class="cc-pt-split">
+            <span class="cc-pt-tag cc-pt-new" id="cc-new-tc">初診 —</span>
+            <span><span class="cc-pt-tag cc-pt-ret" id="cc-returning-visits-tc">回診 —</span><small class="cc-returning-unique" id="cc-returning-tc">不重複 — 人</small></span>
+          </div>
+        </div>
+        <div><div class="cc-m-label">每人次營收</div><div class="cc-m-value" id="cc-rpp-tc">—元</div></div>
+        <div><div class="cc-m-label">排班診次</div><div class="cc-m-value" id="cc-session-tc">0/0</div></div>
+      </div>
+      <div class="prog-header"><span>排班進度</span><span id="cc-progress-label-tc">0% · 診次快照</span></div>
+      <div class="prog-bar"><div class="prog-fill" id="cc-progress-fill-tc" style="width:0%"></div></div>
+    </div>
   </div>
 
   <div class="metric-definition">
@@ -424,7 +459,7 @@
     </div>
     <div class="chart-sub" id="mp-subtitle">載入中…</div>
 
-    <!-- 三院進度卡片（動態渲染）-->
+    <!-- 四院進度卡片（動態渲染）-->
     <div class="mp-clinic-row" id="mp-clinic-row"></div>
 
     <hr class="mp-divider">
@@ -526,6 +561,7 @@
         <button class="dtab active" onclick="switchDoc(this,'tp')">台北初日</button>
         <button class="dtab" onclick="switchDoc(this,'hc')">新竹初日</button>
         <button class="dtab" onclick="switchDoc(this,'kh')">高雄初日</button>
+        <button class="dtab" onclick="switchDoc(this,'tc')">台中初日</button>
       </div>
       <div id="doc-table"></div>
       <div class="footnote">
@@ -621,7 +657,8 @@ const DOCS = {
     {n:'范亞萱',rev:935729, enc:61, sd:18,st:24},
     {n:'李唐越',rev:2639368,enc:147,sd:9, st:15},
     {n:'其他未歸屬',rev:947765,enc:null,sd:null,st:null},
-  ]
+  ],
+  tc:[]
 };
 
 // 2026 年 8 月最終快照。此資料與即時 DOCS 分開保存，9 月 JSON 更新時不會覆蓋。
@@ -881,7 +918,8 @@ const MR = {
 let WD = {
   tp: [26,17,26,24,25,25,25],
   hc: [26,17,26,24,25,25,25],
-  kh: [26,17,26,24,25,25,26]
+  kh: [26,17,26,24,25,25,26],
+  tc: [0,0,0,0,0,0,0]
 };
 
 /* ─────────────────────────────────────────
@@ -1031,17 +1069,18 @@ async function init({ forceNetwork = false } = {}) {
       WD.tp            = months.map(m => hist[m].tp ? hist[m].tp.workdays   : 0);
       WD.hc            = months.map(m => hist[m].hc ? hist[m].hc.workdays   : 0);
       WD.kh            = months.map(m => hist[m].kh ? hist[m].kh.workdays   : 0);
+      WD.tc            = months.map(m => hist[m].tc ? hist[m].tc.workdays   : 0);
     }
     // 當 Apps Script 的 histSessions 尚未歸檔最近完整月份時，使用月底成功快照補齊。
     // 只會加入當月之前的月份，不會把進行中月份誤當歷史資料。
     const finalizedMonths = {
       8: {
         sessions: { tp:152, hc:77, kh:96, tc:0 },
-        workdays: { tp:26, hc:26, kh:25 }
+        workdays: { tp:26, hc:26, kh:25, tc:0 }
       },
       9: {
         sessions: { tp:143, hc:75, kh:93, tc:17 },
-        workdays: { tp:24, hc:24, kh:24 }
+        workdays: { tp:24, hc:24, kh:24, tc:9 }
       }
     };
     Object.entries(finalizedMonths).forEach(([monthText, snapshot]) => {
@@ -1055,6 +1094,7 @@ async function init({ forceNetwork = false } = {}) {
         WD.tp.push(snapshot.workdays.tp);
         WD.hc.push(snapshot.workdays.hc);
         WD.kh.push(snapshot.workdays.kh);
+        WD.tc.push(snapshot.workdays.tc);
       }
     });
 
@@ -1170,9 +1210,11 @@ async function init({ forceNetwork = false } = {}) {
     if (ccHc) ccHc.innerHTML = `${fmt1(AUG_ACT.hc)}<span style="font-size:14px;">萬</span>`;
     const ccKh = document.getElementById('cc-rev-kh');
     if (ccKh) ccKh.innerHTML = `${fmt1(AUG_ACT.kh)}<span style="font-size:14px;">萬</span>`;
+    const ccTc = document.getElementById('cc-rev-tc');
+    if (ccTc) ccTc.innerHTML = `${fmt1(AUG_ACT.tc)}<span style="font-size:14px;">萬</span>`;
 
     // 患者人次、初回診與每人次營收皆由每日 JSON 更新。
-    const clinicKeys = ['tp', 'hc', 'kh'];
+    const clinicKeys = ['tp', 'hc', 'kh', 'tc'];
     const totalPatients = clinicKeys.reduce((sum, key) => sum + AUG_PATIENTS[key].total, 0);
     const patientKpi = document.getElementById('kpi-patient-val');
     if (patientKpi) patientKpi.innerHTML = `${fmt(totalPatients)}<span class="kpi-unit">人次</span>`;
@@ -1205,7 +1247,7 @@ async function init({ forceNetwork = false } = {}) {
       tsEl.textContent = ts ? `業績快照：${ts}（每日凌晨更新）` : '業績快照更新時間未知';
     }
 
-    // 上方診次 KPI 與三院卡片原本是寫死值；統一改由診次快照更新。
+    // 上方診次 KPI 與四院卡片統一由診次快照更新。
     syncSessionSummaryCards();
   }
 
@@ -1239,7 +1281,7 @@ document.addEventListener('visibilitychange', () => {
 });
 
 function syncSessionSummaryCards() {
-  const keys = ['tp', 'hc', 'kh'];
+  const keys = ['tp', 'hc', 'kh', 'tc'];
   const totalElapsed = keys.reduce((sum, key) => sum + (Number(AUG_SES[key]) || 0), 0);
   const totalScheduled = keys.reduce((sum, key) => sum + (Number(AUG_TSES[key]) || 0), 0);
   const totalPct = totalScheduled > 0 ? Math.round(totalElapsed / totalScheduled * 100) : 0;
@@ -1249,7 +1291,7 @@ function syncSessionSummaryCards() {
     totalValue.innerHTML = `${totalElapsed}<span class="kpi-unit">/${totalScheduled}</span>`;
   }
   const totalNote = document.getElementById('kpi-session-note');
-  if (totalNote) totalNote.textContent = `三院已過 ${totalPct}%・診次快照`;
+  if (totalNote) totalNote.textContent = `四院已過 ${totalPct}%・診次快照`;
 
   keys.forEach(key => {
     const elapsed = Number(AUG_SES[key]) || 0;
@@ -1487,10 +1529,10 @@ function renderHistReview(){
 ───────────────────────────────────────── */
 // ── 8月業績達成進度卡片（動態渲染）──
 function renderProjCards() {
-  const KEYS = ['tp','hc','kh'];
-  const nm   = {tp:'台北初日', hc:'新竹初日', kh:'高雄初日'};
-  const cls  = {tp:'mp-tp', hc:'mp-hc', kh:'mp-kh'};
-  const fill = {tp:'mp-tp-fill', hc:'mp-hc-fill', kh:'mp-kh-fill'};
+  const KEYS = ['tp','hc','kh','tc'];
+  const nm   = {tp:'台北初日', hc:'新竹初日', kh:'高雄初日', tc:'台中初日'};
+  const cls  = {tp:'mp-tp', hc:'mp-hc', kh:'mp-kh', tc:'mp-tc'};
+  const fill = {tp:'mp-tp-fill', hc:'mp-hc-fill', kh:'mp-kh-fill', tc:'mp-tc-fill'};
 
   const w1 = v => {
     const raw = (Math.abs(v)/10000).toFixed(1);
@@ -1582,7 +1624,7 @@ function renderProjCards() {
   const badge = document.getElementById('mp-total-badge');
   if (badge) {
     const sign = totDelta >= 0 ? '超前' : '落後';
-    badge.textContent = `三院合計${sign} ${w1(totDelta)}萬`;
+    badge.textContent = `四院合計${sign} ${w1(totDelta)}萬`;
   }
 
   // 更新副標題
@@ -1597,8 +1639,8 @@ function renderAugTable() {
   const tbody = document.getElementById('aug-table-body');
   if (!tbody) return;
 
-  const KEYS = ['tp','hc','kh'];
-  const nm = {tp:'台北初日', hc:'新竹初日', kh:'高雄初日'};
+  const KEYS = ['tp','hc','kh','tc'];
+  const nm = {tp:'台北初日', hc:'新竹初日', kh:'高雄初日', tc:'台中初日'};
 
   // 格式工具
   const w1 = v => {
@@ -1641,7 +1683,7 @@ function renderAugTable() {
     totTgt += tgt;
     totSes += ses;
     totTses += tses;
-    // 各院目標與排班比例不同，三院應達目標必須逐院計算後再加總。
+    // 各院目標與排班比例不同，四院應達目標必須逐院計算後再加總。
     totTodayTgt += todayTgt;
 
     rows += `<tr>
@@ -1659,14 +1701,14 @@ function renderAugTable() {
     </tr>`;
   });
 
-  // 三院合計列
+  // 四院合計列
   const totDelta    = totAct - totTodayTgt;
   const totPct      = totAct / totTgt * 100;
   const totDaily    = KEYS.reduce((s,k) => s + (AUG_WD[k]>0 ? AUG_ACT[k]/AUG_WD[k] : 0), 0);
   const totProj     = KEYS.reduce((s,k) => s + (AUG_SES[k]>0&&AUG_TSES[k]>0 ? AUG_ACT[k]/AUG_SES[k]*AUG_TSES[k] : 0), 0);
 
   rows += `<tr class="total-row">
-    <td>三院合計</td>
+    <td>四院合計</td>
     <td>${w1(totTgt)}萬</td>
     <td>${AUG_WD.tp}／${AUG_WD_TOT.tp}天</td>
     <td>${totSes}／${totTses}</td>
@@ -1835,11 +1877,12 @@ const SA = {
     {n:'劉曜增', sd:23, st:30, rev:1289949},
     {n:'范亞萱', sd:18, st:24, rev:935729},
     {n:'李唐越', sd:9,  st:15, rev:2639368},
-  ]
+  ],
+  tc:[]
 };
 
 function syncDoctorRevenueData(doctorRevenue) {
-  ['tp', 'hc', 'kh'].forEach(key => {
+  ['tp', 'hc', 'kh', 'tc'].forEach(key => {
     const rows = Array.isArray(doctorRevenue[key]) ? doctorRevenue[key] : [];
     if (!rows.length) return;
 
@@ -1907,7 +1950,7 @@ function syncDoctorPatientData(doctorPatients) {
 
 function syncDoctorScheduleData(doctorSessions) {
   const clinics = doctorSessions.clinics || doctorSessions;
-  ['tp', 'hc', 'kh'].forEach(key => {
+  ['tp', 'hc', 'kh', 'tc'].forEach(key => {
     const rows = Array.isArray(clinics[key]) ? clinics[key] : [];
     if (!rows.length) return;
     const scheduleMap = new Map(rows.map(row => [row.name, row]));
@@ -2070,8 +2113,8 @@ function renderSA(){
     ? `2026年${REPORT_MONTH_INDEX + 1}月（即時）`
     : MONTH_LABELS[currentSAMonth];
   document.getElementById('sa-subtitle').textContent = monthLabel + ' ' + note;
-  const clinicNames = {tp:'台北初日', hc:'新竹初日', kh:'高雄初日'};
-  const sections = ['tp','hc','kh'].map(clinicKey => {
+  const clinicNames = {tp:'台北初日', hc:'新竹初日', kh:'高雄初日', tc:'台中初日'};
+  const sections = ['tp','hc','kh','tc'].map(clinicKey => {
     const data = isCurrent
       ? SA[clinicKey]
       : isAugustArchive
