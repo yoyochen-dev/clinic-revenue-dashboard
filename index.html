@@ -901,7 +901,7 @@ const MR = {
     tp: [3200, 3000, 3300, 3500, 3500, 3500, 3600, 3600, 3600, 3600, 3800, 3800],
     hc: [1200, 1000, 1300, 1300, 1300, 1300, 1400, 1400, 1300, 1400, 1400, 1500],
     kh: [1000, 1000, 1200, 1200, 1400, 1400, 1400, 1400, 1300, 1300, 1300, 1500],
-    tc: [   0,    0,    0,    0,    0,    0,    0,    0,  300,  500,  500,  600],  // 台中新診所：9月起
+    tc: [   0,    0,    0,    0,    0,    0,    0,    0,  150,  300,  500,  600],  // 台中新診所：9月起
   },
   actual: {  // 元（Databricks fct_clinic_pos_order_details）；init() 從 Apps Script 更新
     tp: [33344458,22880973,34032987,31810673,31969878,31724033,34335078],
@@ -1362,12 +1362,12 @@ function renderHistReview(){
     : `<span class="ss-neg">${d}萬</span>`;
   const pCls = p => p>=100?'ss-pct-g':p>=90?'ss-pct-a':'ss-pct-r';
 
-  const sesSum = i => S.tp[i]+S.hc[i]+S.kh[i];
-  const actSum = i => A.tp[i]+A.hc[i]+A.kh[i];
-  const tgtSum = i => (T.tp[i]+T.hc[i]+T.kh[i])*10000;
-  const augTot    = AUG_ACT.tp+AUG_ACT.hc+AUG_ACT.kh;
-  const augTgtTot = AUG_TGT.tp+AUG_TGT.hc+AUG_TGT.kh;
-  const augSesTot = AUG_SES.tp+AUG_SES.hc+AUG_SES.kh;
+  const sesSum = i => S.tp[i]+S.hc[i]+S.kh[i]+(S.tc[i]||0);
+  const actSum = i => A.tp[i]+A.hc[i]+A.kh[i]+(A.tc[i]||0);
+  const tgtSum = i => (T.tp[i]+T.hc[i]+T.kh[i]+T.tc[i])*10000;
+  const augTot    = AUG_ACT.tp+AUG_ACT.hc+AUG_ACT.kh+(AUG_ACT.tc||0);
+  const augTgtTot = AUG_TGT.tp+AUG_TGT.hc+AUG_TGT.kh+(AUG_TGT.tc||0);
+  const augSesTot = AUG_SES.tp+AUG_SES.hc+AUG_SES.kh+(AUG_SES.tc||0);
 
   let h = `<thead><tr>
     <th class="ss-th-metric">指標</th>
@@ -1378,7 +1378,7 @@ function renderHistReview(){
 
   /* ── 上班天數 ── */
   h += `<tr class="ss-section-top">
-    <td rowspan="3" class="ss-metric-lbl">上班<br>天數</td>
+    <td rowspan="4" class="ss-metric-lbl">上班<br>天數</td>
     <td class="ss-clinic-lbl">台北</td>
     ${WD.tp.map(v=>`<td>${v}</td>`).join('')}<td class="ss-aug-cell">${AUG_WD.tp}</td>
   </tr>
@@ -1387,11 +1387,14 @@ function renderHistReview(){
   </tr>
   <tr><td class="ss-clinic-lbl">高雄</td>
     ${WD.kh.map(v=>`<td>${v}</td>`).join('')}<td class="ss-aug-cell">${AUG_WD.kh}</td>
+  </tr>
+  <tr><td class="ss-clinic-lbl">台中</td>
+    ${WD.tc.map((v,i)=>`<td>${i>=8?v:'—'}</td>`).join('')}<td class="ss-aug-cell">${AUG_WD.tc}</td>
   </tr>`;
 
   /* ── 上班診數 ── */
   h += `<tr class="ss-section-top">
-    <td rowspan="4" class="ss-metric-lbl">上班<br>診數</td>
+    <td rowspan="5" class="ss-metric-lbl">上班<br>診數</td>
     <td class="ss-clinic-lbl">台北</td>
     ${S.tp.map(v=>`<td>${v}</td>`).join('')}<td class="ss-aug-cell">${AUG_SES.tp}</td>
   </tr>
@@ -1401,6 +1404,9 @@ function renderHistReview(){
   <tr><td class="ss-clinic-lbl">高雄</td>
     ${S.kh.map(v=>`<td>${v}</td>`).join('')}<td class="ss-aug-cell">${AUG_SES.kh}</td>
   </tr>
+  <tr><td class="ss-clinic-lbl">台中</td>
+    ${S.tc.map((v,i)=>`<td>${i>=8?v:'—'}</td>`).join('')}<td class="ss-aug-cell">${AUG_SES.tc}</td>
+  </tr>
   <tr class="ss-subtotal"><td class="ss-clinic-lbl ss-total-lbl">合計</td>
     ${Array.from({length:n},(_,i)=>`<td>${sesSum(i)}</td>`).join('')}
     <td class="ss-aug-cell">${augSesTot}</td>
@@ -1408,7 +1414,7 @@ function renderHistReview(){
 
   /* ── 業績 ── */
   h += `<tr class="ss-section-top">
-    <td rowspan="4" class="ss-metric-lbl">業績</td>
+    <td rowspan="5" class="ss-metric-lbl">業績</td>
     <td class="ss-clinic-lbl">台北</td>
     ${A.tp.map((v,i)=>`<td style="vertical-align:top;padding-top:6px;">${actCell(v,T.tp[i])}</td>`).join('')}
     <td class="ss-aug-cell" style="vertical-align:top;padding-top:6px;">${actCell(AUG_ACT.tp,Math.round(AUG_TGT.tp/10000),true)}</td>
@@ -1421,8 +1427,12 @@ function renderHistReview(){
     ${A.kh.map((v,i)=>`<td style="vertical-align:top;padding-top:6px;">${actCell(v,T.kh[i])}</td>`).join('')}
     <td class="ss-aug-cell" style="vertical-align:top;padding-top:6px;">${actCell(AUG_ACT.kh,Math.round(AUG_TGT.kh/10000),true)}</td>
   </tr>
+  <tr><td class="ss-clinic-lbl">台中</td>
+    ${A.tc.map((v,i)=>`<td style="vertical-align:top;padding-top:6px;">${i>=8?actCell(v,T.tc[i]):'—'}</td>`).join('')}
+    <td class="ss-aug-cell" style="vertical-align:top;padding-top:6px;">${actCell(AUG_ACT.tc,Math.round(AUG_TGT.tc/10000),true)}</td>
+  </tr>
   <tr class="ss-subtotal"><td class="ss-clinic-lbl ss-total-lbl">合計</td>
-    ${Array.from({length:n},(_,i)=>`<td style="vertical-align:top;padding-top:6px;">${actCell(actSum(i),T.tp[i]+T.hc[i]+T.kh[i])}</td>`).join('')}
+    ${Array.from({length:n},(_,i)=>`<td style="vertical-align:top;padding-top:6px;">${actCell(actSum(i),T.tp[i]+T.hc[i]+T.kh[i]+T.tc[i])}</td>`).join('')}
     <td class="ss-aug-cell" style="vertical-align:top;padding-top:6px;">${actCell(augTot,Math.round(augTgtTot/10000),true)}</td>
   </tr>`;
 
@@ -1448,23 +1458,27 @@ function renderHistReview(){
   const avgDly = {
     tp: A.tp.reduce((s,v)=>s+v,0) / WD.tp.reduce((s,v)=>s+v,0),
     hc: A.hc.reduce((s,v)=>s+v,0) / WD.hc.reduce((s,v)=>s+v,0),
-    kh: A.kh.reduce((s,v)=>s+v,0) / WD.kh.reduce((s,v)=>s+v,0)
+    kh: A.kh.reduce((s,v)=>s+v,0) / WD.kh.reduce((s,v)=>s+v,0),
+    tc: A.tc.reduce((s,v,i)=>s+(i>=8?v:0),0) / WD.tc.reduce((s,v,i)=>s+(i>=8?v:0),0)
   };
   const augDly = {
     tp: AUG_ACT.tp / AUG_WD.tp,
     hc: AUG_ACT.hc / AUG_WD.hc,
-    kh: AUG_ACT.kh / AUG_WD.kh
+    kh: AUG_ACT.kh / AUG_WD.kh,
+    tc: AUG_ACT.tc / AUG_WD.tc
   };
   // 1-7月各院平均每診均收
   const avgRps = {
     tp: A.tp.reduce((s,v)=>s+v,0) / S.tp.reduce((s,v)=>s+v,0),
     hc: A.hc.reduce((s,v)=>s+v,0) / S.hc.reduce((s,v)=>s+v,0),
-    kh: A.kh.reduce((s,v)=>s+v,0) / S.kh.reduce((s,v)=>s+v,0)
+    kh: A.kh.reduce((s,v)=>s+v,0) / S.kh.reduce((s,v)=>s+v,0),
+    tc: A.tc.reduce((s,v,i)=>s+(i>=8?v:0),0) / S.tc.reduce((s,v,i)=>s+(i>=8?v:0),0)
   };
   const augRps = {
     tp: AUG_ACT.tp / AUG_SES.tp,
     hc: AUG_ACT.hc / AUG_SES.hc,
-    kh: AUG_ACT.kh / AUG_SES.kh
+    kh: AUG_ACT.kh / AUG_SES.kh,
+    tc: AUG_ACT.tc / AUG_SES.tc
   };
   // 比較標籤：▲+X% 綠 / ▼-X% 紅
   const vsBadge = (curr, avg) => {
@@ -1475,7 +1489,7 @@ function renderHistReview(){
   };
 
   h += `<tr class="ss-section-top">
-    <td rowspan="3" class="ss-metric-lbl">日均<br>營業額</td>
+    <td rowspan="4" class="ss-metric-lbl">日均<br>營業額</td>
     <td class="ss-clinic-lbl">台北</td>
     ${A.tp.map((v,i)=>`<td>${wd(v,WD.tp[i])}萬</td>`).join('')}
     <td class="ss-aug-cell" style="vertical-align:top;padding-top:5px;">
@@ -1490,11 +1504,16 @@ function renderHistReview(){
     ${A.kh.map((v,i)=>`<td>${wd(v,WD.kh[i])}萬</td>`).join('')}
     <td class="ss-aug-cell" style="vertical-align:top;padding-top:5px;">
       <div style="font-weight:700;">${wd(AUG_ACT.kh,AUG_WD.kh)}萬</div>${vsBadge(augDly.kh,avgDly.kh)}</td>
+  </tr>
+  <tr><td class="ss-clinic-lbl">台中</td>
+    ${A.tc.map((v,i)=>`<td>${i>=8?wd(v,WD.tc[i])+'萬':'—'}</td>`).join('')}
+    <td class="ss-aug-cell" style="vertical-align:top;padding-top:5px;">
+      <div style="font-weight:700;">${wd(AUG_ACT.tc,AUG_WD.tc)}萬</div>${vsBadge(augDly.tc,avgDly.tc)}</td>
   </tr>`;
 
   /* ── 每診均收 ── */
   h += `<tr class="ss-section-top">
-    <td rowspan="3" class="ss-metric-lbl">每診<br>均收</td>
+    <td rowspan="4" class="ss-metric-lbl">每診<br>均收</td>
     <td class="ss-clinic-lbl">台北</td>
     ${A.tp.map((v,i)=>`<td>${wds(v,S.tp[i])}萬</td>`).join('')}
     <td class="ss-aug-cell" style="vertical-align:top;padding-top:5px;">
@@ -1509,14 +1528,20 @@ function renderHistReview(){
     ${A.kh.map((v,i)=>`<td>${wds(v,S.kh[i])}萬</td>`).join('')}
     <td class="ss-aug-cell" style="vertical-align:top;padding-top:5px;">
       <div style="font-weight:700;">${wds(AUG_ACT.kh,AUG_SES.kh)}萬</div>${vsBadge(augRps.kh,avgRps.kh)}</td>
+  </tr>
+  <tr><td class="ss-clinic-lbl">台中</td>
+    ${A.tc.map((v,i)=>`<td>${i>=8?wds(v,S.tc[i])+'萬':'—'}</td>`).join('')}
+    <td class="ss-aug-cell" style="vertical-align:top;padding-top:5px;">
+      <div style="font-weight:700;">${wds(AUG_ACT.tc,AUG_SES.tc)}萬</div>${vsBadge(augRps.tc,avgRps.tc)}</td>
   </tr>`;
 
   h += '</tbody>';
   document.getElementById('hist-review-table').innerHTML = h;
 
   // header badge（1-7月累計）
-  const cumA   = A.tp.reduce((s,v)=>s+v,0)+A.hc.reduce((s,v)=>s+v,0)+A.kh.reduce((s,v)=>s+v,0);
-  const cumTgt = (T.tp.reduce((s,v)=>s+v,0)+T.hc.reduce((s,v)=>s+v,0)+T.kh.reduce((s,v)=>s+v,0))*10000;
+  const cumA   = A.tp.reduce((s,v)=>s+v,0)+A.hc.reduce((s,v)=>s+v,0)+A.kh.reduce((s,v)=>s+v,0)+A.tc.reduce((s,v)=>s+v,0);
+  const sumVisibleTargets = values => values.slice(0,n).reduce((sum,value)=>sum+value,0);
+  const cumTgt = (sumVisibleTargets(T.tp)+sumVisibleTargets(T.hc)+sumVisibleTargets(T.kh)+sumVisibleTargets(T.tc))*10000;
   const cum_pct = Math.round(cumA/cumTgt*100);
   const lastLbl = MR.labels[MR.labels.length - 1]; // 例：'7月' → '8月'（自動）
   const hBadge = document.getElementById('hist-total-badge');
