@@ -554,8 +554,7 @@
     </div>
     <div class="collapse-body is-collapsed" id="doc-body">
       <div class="dtab-row" id="doc-month-tabs" style="flex-wrap:wrap;gap:5px;margin-bottom:8px;">
-        <button class="dtab doc-month-tab active" data-month="08" onclick="switchDocMonth(this,'08')">8月（完整月）</button>
-        <button class="dtab doc-month-tab" data-month="09" onclick="switchDocMonth(this,'09')">9月（即時）</button>
+        <!-- 由 updateReportingMonthLabels() 依最新 JSON 月份自動產生 -->
       </div>
       <div class="dtab-row">
         <button class="dtab active" onclick="switchDoc(this,'tp')">台北初日</button>
@@ -567,7 +566,7 @@
       <div class="footnote">
         ＊ 患者人次：新客數＋舊客人次；<code>cofit_bi_prod.int.int_clinic_encounters</code>（state=2 已完成）<br>
         ＊ 舊客人次反映工作量；舊客人數為不重複回診人數，反映病患廣度<br>
-        ＊ 醫師營收：<code>cofit_bi_prod.core.fct_clinic_pos_order_details</code>（actual_cashflow，report_month=2026-08）<br>
+        ＊ 醫師營收：<code>cofit_bi_prod.core.fct_clinic_pos_order_details</code>（actual_cashflow，report_month=2026-<span data-report-month-padded>08</span>）<br>
         ＊ 排班診次進度：來源為「初日診所｜已過診次儀表板」Apps Script（統計至 <span data-session-cutoff>2026/08/15</span>）<br>
         ＊ SimplyBook（stg_simplybook_schedule_snapshots）的 monthly_booked 為病患預約量，與診次格數定義不同，不宜直接套用<br>
         ＊ 各院「其他未歸屬」＝院所總營收－有明確歸屬醫師的營收
@@ -589,16 +588,8 @@
     <div class="collapse-body is-collapsed" id="sa-body">
       <div id="sa-subtitle" class="chart-sub" style="margin-bottom:6px;margin-top:10px;"></div>
       <!-- 月份切換 -->
-      <div class="dtab-row" style="flex-wrap:wrap;gap:5px;margin-bottom:10px;">
-        <button class="dtab month-tab" onclick="switchMonth(this,'01')">1月</button>
-        <button class="dtab month-tab" onclick="switchMonth(this,'02')">2月</button>
-        <button class="dtab month-tab" onclick="switchMonth(this,'03')">3月</button>
-        <button class="dtab month-tab" onclick="switchMonth(this,'04')">4月</button>
-        <button class="dtab month-tab" onclick="switchMonth(this,'05')">5月</button>
-        <button class="dtab month-tab" onclick="switchMonth(this,'06')">6月</button>
-        <button class="dtab month-tab" onclick="switchMonth(this,'07')">7月</button>
-        <button class="dtab month-tab active" data-month="08" onclick="switchMonth(this,'08')">8月（完整月）</button>
-        <button class="dtab month-tab" data-month="09" onclick="switchMonth(this,'09')">9月（即時）</button>
+      <div class="dtab-row" id="sa-month-tabs" style="flex-wrap:wrap;gap:5px;margin-bottom:10px;">
+        <!-- 由 updateReportingMonthLabels() 依最新 JSON 月份自動產生 -->
       </div>
       <div id="sa-table"></div>
       <div class="footnote">
@@ -973,6 +964,30 @@ function updateReportingMonthLabels(monthIndex) {
   document.querySelectorAll('[data-report-month]').forEach(node => {
     node.textContent = month;
   });
+  document.querySelectorAll('[data-report-month-padded]').forEach(node => {
+    node.textContent = String(month).padStart(2, '0');
+  });
+  buildLiveMonthTabs('doc-month-tabs', 'doc-month-tab', 8, month, switchDocMonth);
+  buildLiveMonthTabs('sa-month-tabs', 'month-tab', 1, month, switchMonth);
+}
+
+// 月份按鈕不再寫死。每天讀到最新 JSON 後，自動補到資料所屬月份；
+// 當月標示「即時」，已結束月份標示「完整月」。
+function buildLiveMonthTabs(containerId, tabClass, firstMonth, liveMonth, onSwitch) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.innerHTML = '';
+  for (let month = firstMonth; month <= liveMonth; month += 1) {
+    const monthKey = String(month).padStart(2, '0');
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = `dtab ${tabClass}${month === liveMonth ? ' active' : ''}`;
+    button.dataset.month = monthKey;
+    const suffix = month === liveMonth ? '（即時）' : (month >= 8 ? '（完整月）' : '');
+    button.textContent = `${month}月${suffix}`;
+    button.addEventListener('click', () => onSwitch(button, monthKey));
+    container.appendChild(button);
+  }
 }
 
 function isValidDashboardData(data) {
@@ -2118,7 +2133,8 @@ const CLINIC_DAYS_FULL = 26;
 const MONTH_LABELS = {
   '01':'2026年1月','02':'2026年2月','03':'2026年3月','04':'2026年4月',
   '05':'2026年5月','06':'2026年6月','07':'2026年7月',
-  '08':'2026年8月（完整月）', '09':'2026年9月（即時）'
+  '08':'2026年8月（完整月）', '09':'2026年9月（完整月）',
+  '10':'2026年10月（即時）'
 };
 
 let currentSAMonth  = '08';
