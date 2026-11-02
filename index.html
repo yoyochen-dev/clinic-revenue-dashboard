@@ -1096,6 +1096,11 @@ async function init({ forceNetwork = false } = {}) {
       9: {
         sessions: { tp:143, hc:75, kh:93, tc:17 },
         workdays: { tp:24, hc:24, kh:24, tc:9 }
+      },
+      10: {
+        // 10/23 四院停診；10/24 台北、新竹、台中停診，高雄照常。
+        sessions: { tp:136, hc:75, kh:86, tc:46 },
+        workdays: { tp:23, hc:23, kh:24, tc:23 }
       }
     };
     Object.entries(finalizedMonths).forEach(([monthText, snapshot]) => {

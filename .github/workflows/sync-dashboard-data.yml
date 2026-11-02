@@ -20,7 +20,9 @@ jobs:
 
       - name: Download latest dashboard data
         run: |
-          curl --fail --location --retry 3 --max-time 90 \
+          curl --fail --location \
+            --retry 5 --retry-all-errors --retry-delay 10 \
+            --connect-timeout 15 --max-time 120 \
             'https://script.google.com/macros/s/AKfycbx4_tZukK_poowvvBCYoV1wygn-wStEVOHTel7oyC3w1_g3ZPcLKHWtGmzM_T8nw50/exec' \
             --output dashboard-data.json
 
